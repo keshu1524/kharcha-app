@@ -60,7 +60,7 @@ RAPCHI BARE FEATURES (v12 update)
    • 🔔 Notification bell permission
 🎤 कॉमेंट microfia (Chrome/Android)
 🔐 PIN lock (top bar 🔒)
-🎉 Welcome popup: app khulne par "Welcome to Keshu first app!" (din me 1 baar, time ke hisab se greeting)
+🎉 Welcome popup: app khulne par "Welcome to Keshu first app!" (pehli baar NAAM poochta hai, save karta hai — fir har baar naam ke saath "Wapas swagat, <naam>!") + 💡 har baar ek nayi MOTIVATIONAL LINE — naam Settings ⚙️ me badal sakte ho
 
 ═══════════════════════════════════════
 PROBLEMS?

@@ -213,8 +213,8 @@ var T = {
     recAddedNow: '🔁 Is mahine ka ye kharcha khud jod diya:',
     notifOk: '🔔 Notification ON — ab app khulne par yaad milega', notifNo: '⚠️ Phone ne permission nahi di — Chrome settings me allow karein',
     notifBody: 'Aaj ka koi kharcha nahi — log karо!',
-    greetMorning: '☀️ Subh bakhair!', greetAfternoon: '🌤️ Namaste!', greetEvening: '🌆 Shubh sandhya!',
-    welcomeBtn: 'Shuru karo 🚀'
+    greetMorning: '🌅 Nayi subah, naya hisaab!', greetAfternoon: '🌤️ Namaste!', greetEvening: '🌆 Shubh sandhya!',
+    welcomeBtn: 'Shuru karo 🚀', userNamePh: 'Aapka naam likho (jaise: Keshu)', nameSaved: 'naam save ho gaya! 🎉'
   },
   en: {
     appTitle: '💰 Kharcha Tracker', appSub: 'Track daily expenses the easy way',
@@ -311,7 +311,7 @@ var T = {
     notifOk: '🔔 Bell ON — reminder when app opens', notifNo: "⚠️ Phone didn't allow — enable in Chrome settings",
     notifBody: 'Nothing spent today — log it!',
     greetMorning: '☀️ Good morning!', greetAfternoon: '🌤️ Good afternoon!', greetEvening: '🌆 Good evening!',
-    welcomeBtn: "Let's start 🚀"
+    welcomeBtn: "Let's start 🚀", userNamePh: 'Type your name (like: Keshu)', nameSaved: 'name saved! 🎉'
   }
 };
 function t(key) { return T[settings.lang][key] !== undefined ? T[settings.lang][key] : T.hi[key]; }
@@ -790,12 +790,19 @@ function renderRecList() {
 }
 document.getElementById('settingsBtn').addEventListener('click', function () {
   cycleDayInput.value = settings.cycleDay === 1 ? '' : settings.cycleDay;
+  document.getElementById('settingsNameInput').value = getUserName();
   renderRecList();
   settingsModal.hidden = false;
 });
 document.getElementById('settingsCancel').addEventListener('click', function () { settingsModal.hidden = true; });
 settingsModal.addEventListener('click', function (ev) { if (ev.target === settingsModal) settingsModal.hidden = true; });
 document.getElementById('settingsSave').addEventListener('click', function () {
+  var nmNew = document.getElementById('settingsNameInput').value.trim();
+  var nmOld = getUserName();
+  if (nmNew && nmNew !== nmOld) {
+    setUserName(nmNew);
+    showToast('👤 ' + nmNew + ' — ' + t('nameSaved'));
+  }
   var v = parseInt(cycleDayInput.value, 10);
   if (v >= 2 && v <= 28) {
     settings.cycleDay = v;
@@ -2264,20 +2271,67 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 
 // ================== WELCOME (Keshu first app!) ==================
 var welcomeModal = document.getElementById('welcomeModal');
-document.getElementById('welcomeOk').addEventListener('click', function () { welcomeModal.hidden = true; });
-welcomeModal.addEventListener('click', function (ev) { if (ev.target === welcomeModal) welcomeModal.hidden = true; });
+var userNameInput = document.getElementById('userNameInput');
+var userNameKey = 'kharcha_user_name_v1';
+function getUserName() { return localStorage.getItem(userNameKey) || ''; }
+function setUserName(n) { localStorage.setItem(userNameKey, n.trim()); }
+// Motivational quotes — har open par nayi line
+var QUOTES_HI = [
+  '💪 Paise ki soch badlo, paisa khud badlega',
+  '🌱 Aaj ka ek kharcha record = kal ka poora control',
+  '🚀 Chhote chhote bachao, bade sapne banate hain',
+  '💰 Hisaab rakho — paisa khud aapka rahega',
+  '🔥 Aapki streak mat todo — roz thoda thoda likho',
+  '📊 Jo maapte hain, wo hi sambhalte hain',
+  '🎯 Budget dushman nahi, dost hai',
+  '✨ Aaj jitna likhoge, kal utna aasan hoga',
+  '🏆 Har mahina ek nayi jeet ka mauka hai',
+  '🧘 Sachchi shanti: jab paise ka hisaab clear ho'
+];
+var QUOTES_EN = [
+  '💪 Change your money mindset, money follows',
+  '🌱 Log one expense today = full control tomorrow',
+  '🚀 Small savings today, big dreams tomorrow',
+  '💰 Track it, and your money tracks you back',
+  "🔥 Don't break your streak — write daily!",
+  '📊 What gets measured, gets managed',
+  '🎯 A budget is a friend, not a foe',
+  '✨ Write today, breathe easy tomorrow',
+  '🏆 Every month is a fresh chance to win',
+  '🧘 Real peace: a clear money picture'
+];
 function showWelcome() {
   var h = new Date().getHours();
   var greet = h < 12 ? t('greetMorning') : h < 17 ? t('greetAfternoon') : t('greetEvening');
-  document.getElementById('welcomeSub').textContent = greet + ' ' + formatDate(getTodayStr());
+  var nm = getUserName();
+  var titleEl = document.getElementById('welcomeTitle');
+  var nameRow = document.getElementById('nameRow');
+  if (nm) {
+    // Naam saved hai — har baar naam ke saath welcome
+    titleEl.textContent = (settings.lang === 'en' ? 'Welcome back, ' + nm + '! 👋' : 'Wapas swagat, ' + nm + '! 👋');
+    nameRow.hidden = true;
+  } else {
+    // Pehli baar — naam maango
+    titleEl.textContent = 'Welcome to Keshu first app!';
+    nameRow.hidden = false;
+    userNameInput.value = '';
+    setTimeout(function () { userNameInput.focus(); }, 200);
+  }
+  document.getElementById('welcomeSub').textContent = (nm ? greet + ' — ' : '') + formatDate(getTodayStr());
+  // Motivational quote (har baar nayi)
+  var quotes = settings.lang === 'en' ? QUOTES_EN : QUOTES_HI;
+  document.getElementById('welcomeQuote').textContent = '💡 ' + quotes[Math.floor(Math.random() * quotes.length)];
   welcomeModal.hidden = false;
 }
-function maybeWelcome() {
-  var key = 'kharcha_welcome_' + getTodayStr();
-  if (localStorage.getItem(key) === '1') return;
-  localStorage.setItem(key, '1');
-  showWelcome();
-}
+// Har app-open par welcome dikhao (naam ke saath)
+function maybeWelcome() { showWelcome(); }
+document.getElementById('welcomeOk').addEventListener('click', function () {
+  if (!getUserName() && userNameInput.value.trim()) {
+    setUserName(userNameInput.value);
+    showToast('👤 ' + userNameInput.value.trim() + ' — ' + t('nameSaved'));
+  }
+  welcomeModal.hidden = true;
+});
 
 // ================== INIT ==================
 applySettings();

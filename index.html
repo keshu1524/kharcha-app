@@ -90,6 +90,8 @@
     <div class="income-history" id="recList"></div>
     <div class="set-label">🔔 Roz ka reminder notification</div>
     <button type="button" class="tool-btn" id="notifBtn" style="width:100%;">🔔 Notification ON karo</button>
+    <div class="set-label">👤 Aapka naam (welcome message ke liye)</div>
+    <input type="text" id="settingsNameInput" maxlength="20" data-i18n-ph="userNamePh" placeholder="Aapka naam likho (jaise: Keshu)" autocomplete="off">
     <div class="modal-actions">
       <button type="button" class="m-cancel" id="settingsCancel">Cancel</button>
       <button type="button" class="m-save" id="settingsSave">Save</button>
@@ -414,6 +416,10 @@
     <div class="w-emoji">🎉</div>
     <div class="w-title" id="welcomeTitle">Welcome to Keshu first app!</div>
     <div class="w-sub" id="welcomeSub"></div>
+    <div class="w-quote" id="welcomeQuote"></div>
+    <div id="nameRow" hidden>
+      <input type="text" id="userNameInput" maxlength="20" data-i18n-ph="userNamePh" placeholder="Aapka naam likho (jaise: Keshu)" autocomplete="off" style="width:100%;text-align:center;">
+    </div>
     <button type="button" class="m-save" id="welcomeOk" style="width:100%;">Shuru karo 🚀</button>
   </div>
 </div>
