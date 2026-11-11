@@ -44,7 +44,7 @@ self.addEventListener('fetch', function (event) {
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).then(function (response) {
+      fetch(new Request(event.request, { cache: 'reload' })).then(function (response) {
         if (response && response.status === 200 && response.type === 'basic') {
           var copy = response.clone();
           caches.open(CACHE_NAME).then(function (cache) {
