@@ -132,7 +132,7 @@ function getCategory(e) {
 // ================== I18N ==================
 var T = {
   hi: {
-    appTitle: '💰 Kharcha Tracker', appSub: 'Roz ka kharcha aasan bhasha me track karein',
+    appTitle: '💰 Keshu Kharcha Tracker', appSub: 'Roz ka kharcha aasan bhasha me track karein',
     settings: '⚙️ Settings', themeBtn: 'Dark Mode', langBtn: 'English',
     moneyLabel: 'Mere paas ab itne paise hai', moneyPh: 'Total paisa (₹)',
     sentencePrompt: '✏️ <b>Total paisa</b> set karein — har kharche ke saath baaki paise khud update hota rahega.',
@@ -168,7 +168,7 @@ var T = {
     tagMehenga: 'Mehenga', tagSasta: 'Sasta',
     calendarTitle: '📅 Calendar', calendarSum: 'Is mahine: {S}',
     famTotal: '👨‍👩‍👧 Poore ghar ka kharcha (is mahine):',
-    shareText: "📊 *Kharcha Tracker Report*\n🗓️ Mahine: {MON}\n👨‍👩‍👧 Poore ghar ka kharcha: {TOT}\n{DETAILS}\n💰 Mera bache hue paise: {BAL}\n\n(Kharcha Tracker app se)",
+    shareText: "📊 *Keshu Kharcha Tracker Report*\n🗓️ Mahine: {MON}\n👨‍👩‍👧 Poore ghar ka kharcha: {TOT}\n{DETAILS}\n💰 Mera bache hue paise: {BAL}\n\n(Keshu Kharcha Tracker app se)",
     shareDetailRow: '{ICON} {NAME}: {AMT}',
     toastShareOpened: '📤 WhatsApp khul gaya — report ready hai!',
     goalTitle: '🎯 Is mahine ka kharcha-maksad',
@@ -217,7 +217,7 @@ var T = {
     welcomeBtn: 'Shuru karo 🚀', userNamePh: 'Aapka naam likho (jaise: Keshu)', nameSaved: 'naam save ho gaya! 🎉'
   },
   en: {
-    appTitle: '💰 Kharcha Tracker', appSub: 'Track daily expenses the easy way',
+    appTitle: '💰 Keshu Kharcha Tracker', appSub: 'Track daily expenses the easy way',
     settings: '⚙️ Settings', themeBtn: 'Dark Mode', langBtn: 'Hindi',
     moneyLabel: 'Money I have now', moneyPh: 'Total money (₹)',
     sentencePrompt: '✏️ Set your <b>total money</b> — balance updates automatically with every expense.',
@@ -247,7 +247,7 @@ var T = {
     budgetLabel: 'Category Budget (₹, blank = none)', budgetBtn: '🎨 Budgets', budgetSave: 'Save',
     biggest: '🏆 Biggest:',
     famTotal: '👨‍👩‍👧 Whole family spending (this month):',
-    shareText: "📊 *Kharcha Tracker Report*\n🗓️ Month: {MON}\n👨‍👩‍👧 Family total: {TOT}\n{DETAILS}\n💰 My remaining money: {BAL}\n\n(sent via Kharcha Tracker)",
+    shareText: "📊 *Keshu Kharcha Tracker Report*\n🗓️ Month: {MON}\n👨‍👩‍👧 Family total: {TOT}\n{DETAILS}\n💰 My remaining money: {BAL}\n\n(sent via Keshu Kharcha Tracker)",
     shareDetailRow: '{ICON} {NAME}: {AMT}',
     toastShareOpened: '📤 WhatsApp opened — report ready!',
     trendSame: 'Spending is similar to last month.',
@@ -897,13 +897,13 @@ document.getElementById('notifBtn').addEventListener('click', function () {
   if (!('Notification' in window)) { showToast(t('notifNo')); return; }
   if (Notification.permission === 'granted') {
     showToast(t('notifOk'));
-    try { new Notification('💰 Kharcha Tracker', { body: t('notifBody') }); } catch (e) {}
+    try { new Notification('💰 Keshu Kharcha Tracker', { body: t('notifBody') }); } catch (e) {}
     return;
   }
   Notification.requestPermission().then(function (perm) {
     if (perm === 'granted') {
       showToast(t('notifOk'));
-      try { new Notification('💰 Kharcha Tracker', { body: t('notifBody') }); } catch (e) {}
+      try { new Notification('💰 Keshu Kharcha Tracker', { body: t('notifBody') }); } catch (e) {}
     } else {
       showToast(t('notifNo'));
     }
@@ -916,7 +916,7 @@ function dailyNotif() {
   if (p.expenses.some(function (x) { return x.date === getTodayStr(); })) return;
   if (localStorage.getItem(shownKey) === '1') return;
   localStorage.setItem(shownKey, '1');
-  try { new Notification('💰 Kharcha Tracker', { body: t('notifBody') }); } catch (e) {}
+  try { new Notification('💰 Keshu Kharcha Tracker', { body: t('notifBody') }); } catch (e) {}
 }
 
 // ================== ADD EXPENSE ==================
