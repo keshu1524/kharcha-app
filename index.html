@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light" data-accent="purple">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6d28d9">
+<!-- PWA app support -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kharcha">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Kharcha Tracker 💰</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>💰 Kharcha Tracker</h1>
+    <p data-i18n="appSub">Roz ka kharcha aasan bhasha me track karein</p>
+    <div class="top-controls">
+      <button type="button" class="top-btn" id="langBtn" title="Hindi / English badlein">English</button>
+      <button type="button" class="top-btn" id="themeBtn" title="Dark / Light mode">🌙 Dark Mode</button>
+      <button type="button" class="top-btn" id="cloudBtn" title="Data cloud (Firebase) me save karo — naye phone me wahi code daalo">☁️ Cloud</button>
+      <button type="button" class="top-btn" id="shareBtn" title="Poore ghar ka report WhatsApp par bhejо">📤 Share</button>
+      <button type="button" class="top-btn" id="backupBtn" title="Pura data ek file me download karо">⬇️ Backup</button>
+      <button type="button" class="top-btn" id="restoreBtn" title="Backup file se data wapas lao">⬆️ Restore</button>
+      <input type="file" id="restoreFile" hidden accept=".json,application/json">
+      <button type="button" class="top-btn" id="pinBtn" title="App par PIN lagao (sirf aap khul sakein)">🔒 Pin</button>
+      <button type="button" class="top-btn" id="settingsBtn" title="Settings: salary cycle, recurring kharcha, bell">⚙️ Settings</button>
+      <span class="accent-dot accent-purple sel" data-a="purple" title="Purple"></span>
+      <span class="accent-dot accent-blue" data-a="blue" title="Blue"></span>
+      <span class="accent-dot accent-green" data-a="green" title="Green"></span>
+      <span class="accent-dot accent-pink" data-a="pink" title="Pink"></span>
+    </div>
+    <div id="accentRow" hidden></div>
+  </header>
+
+  <!-- Family mode: profiles -->
+  <div class="profile-bar" id="profileBar"></div>
+  <div class="prof-panel" id="profPanel" hidden></div>
+  <div class="family-total" id="familyTotal" hidden></div>
+
+  <!-- Reminder banner -->
+  <div class="banner" id="reminderBanner" hidden>
+    <span class="b-emoji">🔔</span>
+    <span class="b-text" data-i18n="bannerMsg">Aaj ka koi kharcha nahi — log karo!</span>
+    <button type="button" class="b-ok" id="bannerOk">✓</button>
+  </div>
+
+  <!-- Total card -->
+  <div class="total-card">
+    <div class="tc-top">
+      <div>
+        <div class="label" data-i18n="moneyLabel">Mere paas ab itne paise hai</div>
+        <div class="amount" id="totalAmount">₹—</div>
+      </div>
+      <button type="button" class="edit-btn" id="incomeBtn" aria-label="Paisa aaya" title="Paisa aaya jodо (salary, wapas mila)">➕</button>
+      <button type="button" class="edit-btn" id="editMoneyBtn" aria-label="Total paisa" title="Total paisa badlein (kitna tha)">✏️</button>
+    </div>
+    <!-- Income modal -->
+<div class="modal-overlay" id="incomeModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">✅ Paisa aaya (income)</div>
+    <input type="number" id="incomeAmount" min="1" step="any" inputmode="decimal" placeholder="Kitna paisa aaya (₹)">
+    <input type="text" id="incomeFrom" maxlength="30" placeholder="Kisne/kahan se (jaise: Salary, Papa)">
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="incomeCancel">Cancel</button>
+      <button type="button" class="m-save" id="incomeSave">Save</button>
+    </div>
+    <div class="income-history" id="incomeHistory"></div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settingsModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">⚙️ Settings</div>
+    <div class="set-label">📅 Mahina kis tarikh se shuru hota hai (salary cycle)?</div>
+    <input type="number" id="cycleDayInput" min="1" max="28" inputmode="numeric" placeholder="1 = mahina ki 1 tarikh">
+    <div class="set-label">🔁 Har mahine khud aa jayega wala kharcha (rent, recharge...)</div>
+    <div class="mrow">
+      <input type="text" id="recName" maxlength="20" placeholder="Naam (jaise: Room Rent)">
+      <input type="number" id="recAmount" min="1" step="any" inputmode="decimal" placeholder="₹">
+      <input type="number" id="recDay" min="1" max="28" inputmode="numeric" placeholder="Tarikh">
+    </div>
+    <button type="button" class="m-save" id="recAdd" style="width:100%;">🔁 Recurring jodein</button>
+    <div class="income-history" id="recList"></div>
+    <div class="set-label">🔔 Roz ka reminder notification</div>
+    <button type="button" class="tool-btn" id="notifBtn" style="width:100%;">🔔 Notification ON karo</button>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="settingsCancel">Cancel</button>
+      <button type="button" class="m-save" id="settingsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo viewer modal -->
+<div class="modal-overlay" id="photoModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">📸 Raseed / Bill photo</div>
+    <img id="photoImg" style="width:100%;border-radius:10px;" alt="Bill">
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="photoClose">Band karo</button>
+    </div>
+  </div>
+</div>
+    <div class="money-form" id="moneyForm" hidden>
+      <input type="number" id="moneyInput" inputmode="decimal" min="0" step="any" data-i18n-ph="moneyPh" placeholder="Total paisa (₹)">
+      <button type="button" id="saveMoneyBtn">Save</button>
+    </div>
+    <div class="sentence" id="summarySentence"></div>
+    <div class="health-pill" id="healthPill" hidden></div>
+    <div class="total-stats">
+      <span id="todayStat">Aaj: ₹0</span>
+      <span id="countStat">0 kharche</span>
+    </div>
+  </div>
+
+  <!-- Naya kharcha form -->
+  <form class="form-card" id="expenseForm">
+    <h2 data-i18n="formTitle">➕ Naya Kharcha</h2>
+    <div class="field">
+      <label for="name" data-i18n="nameLabel">Kharche ka naam</label>
+      <div class="name-row">
+        <input type="text" id="name" data-i18n-ph="namePh" maxlength="40" required autocomplete="off">
+        <button type="button" class="mic-btn" id="micBtn" title="🎤 Bol ke likho">🎤</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="category" data-i18n="catLabel">Category (kis cheez ka kharcha)</label>
+      <select id="category">
+        <option value="auto">✨ Apne aap pehchaan lega</option>
+        <option value="food">🍛 Khana-Peena</option>
+        <option value="travel">🚌 Aavaghat (Travel)</option>
+        <option value="bill">🧾 Bill-Recharge</option>
+        <option value="health">💊 Dawai-Sehat</option>
+        <option value="shopping">🛍️ Shopping</option>
+        <option value="fun">🎉 Masti</option>
+        <option value="other">💸 Aur Kuch</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="amount" data-i18n="amountLabel">Rakam (₹)</label>
+        <input type="number" id="amount" placeholder="0" min="1" step="any" inputmode="decimal" required>
+      </div>
+      <div class="field">
+        <label for="date" data-i18n="dateLabel">Tarikh</label>
+        <input type="date" id="date" required>
+      </div>
+    </div>
+    <button type="submit" class="add-btn" data-i18n="addBtn">Kharcha Jodein</button>
+    <div class="presets-row" id="presetsRow"></div>
+  </form>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs">
+    <button type="button" class="tab" data-filter="today" data-i18n-tab="today">Aaj</button>
+    <button type="button" class="tab" data-filter="month" data-i18n-tab="month">Ye Mahina</button>
+    <button type="button" class="tab" data-filter="week" data-i18n-tab="week">Is Hafte</button>
+    <button type="button" class="tab active" data-filter="all" data-i18n-tab="all">Sab</button>
+  </div>
+  <div class="trend-line" id="trendLine" hidden></div>
+  <div class="period-line" id="periodLine"></div>
+
+  <!-- Category report -->
+  <div class="report-card" id="reportCard">
+    <h2 id="reportTitle">📊 Category Report</h2>
+    <div id="reportBody"></div>
+    <div style="margin-top:12px;text-align:center;">
+      <div class="tool-btn-row">
+        <button type="button" class="tool-btn" id="catBtn" title="Apni khud ki category banao (emoji ke saath)">➕ Nayi category</button>
+        <button type="button" class="tool-btn" id="budgetBtn" data-i18n="budgetBtn">🎨 Budgets</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6-month chart -->
+  <div class="report-card" id="chartCard">
+    <h2 data-i18n="chartTitle">📈 Pichle 6 mahine ka kharcha</h2>
+    <div id="chartRow" class="chart-row"></div>
+  </div>
+
+  <!-- Yearly summary -->
+  <div class="report-card" id="yearlyCard" hidden>
+    <h2 data-i18n="yearlyTitle">🎁 Is saal ka poora hisaab</h2>
+    <div id="yearlyBody"></div>
+  </div>
+
+  <!-- Smart insights: health + goal + estimate -->
+  <div class="report-card" id="smartCard" hidden>
+    <h2>🧠 Smart Insight</h2>
+    <div id="smartBody"></div>
+  </div>
+
+  <!-- Pie chart -->
+  <div class="report-card" id="pieCard" hidden>
+    <h2 data-i18n="pieTitle">🥧 Category ka pie-chart</h2>
+    <div id="pieBody"></div>
+  </div>
+
+  <!-- Calendar view -->
+  <div class="report-card" id="calendarCard">
+    <h2 data-i18n="calendarTitle">📅 Calendar</h2>
+    <div id="calendarBody"></div>
+  </div>
+
+  <!-- Undo bar -->
+  <div class="undo-bar" id="undoBar" hidden>
+    <span id="undoMsg"></span>
+    <button type="button" class="undo-btn" id="undoBtn" data-i18n="undoBtn">↩️ Wapas lao</button>
+  </div>
+
+  <!-- Search + list -->
+  <div class="search-row">
+    <span class="s-ico">🔍</span>
+    <input type="text" id="searchInput" data-i18n-ph="searchPh" placeholder="Kharche ka naam dhundo..." autocomplete="off">
+  </div>
+  <div class="list-header">
+    <h2 data-i18n="listTitle">📋 Kharche ki Suchi</h2>
+    <div style="display:flex;gap:6px;">
+      <button type="button" class="csv-btn" id="csvBtn" data-i18n="csvBtn" title="Sab kharche ki Excel/CSV file download">📥 Excel</button>
+      <button class="clear-btn" id="clearAll" data-i18n="clearAll">Sab mitayein</button>
+    </div>
+  </div>
+  <div id="list"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Profile modal -->
+<div class="modal-overlay" id="profModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="profileTitle">👤 Naya profile jodein</div>
+    <input type="text" id="profNameInput" maxlength="12" data-i18n-ph="profilePh" placeholder="Naam (jaise: Papa, Mummy)" autocomplete="off">
+    <div class="icon-pick-label label" data-i18n="iconLabel">Icon chunein (optional)</div>
+    <div class="icon-row" id="profIconRow"></div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="profCancel">Cancel</button>
+      <button type="button" class="m-save" id="profSave">Jodein</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay" id="confirmModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="confirmTitle">⚠️ Confirm karein</div>
+    <p class="confirm-msg" id="confirmMsg"></p>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="confirmNo" data-i18n="rukjao">Ruk jaao</button>
+      <button type="button" class="m-danger" id="confirmYes" data-i18n="confirmYes">Haan, karo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit expense modal -->
+<div class="modal-overlay" id="editModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">✏️ <span data-i18n="formTitle">Naya Kharcha</span></div>
+    <input type="text" id="editName" maxlength="40" data-i18n-ph="namePh" placeholder="Kharche ka naam" autocomplete="off">
+    <div class="mrow">
+      <input type="number" id="editAmount" min="1" step="any" inputmode="decimal" data-i18n-ph="amountLabel" placeholder="Rakam">
+      <input type="date" id="editDate">
+    </div>
+    <div class="modal-label" data-i18n="catLabel">Category</div>
+    <select id="editCategory">
+      <option value="auto">✨ Apne aap pehchaan lega</option>
+      <option value="food">🍛 Khana-Peena</option>
+      <option value="travel">🚌 Aavaghat (Travel)</option>
+      <option value="bill">🧾 Bill-Recharge</option>
+      <option value="health">💊 Dawai-Sehat</option>
+      <option value="shopping">🛍️ Shopping</option>
+      <option value="fun">🎉 Masti</option>
+      <option value="other">💸 Aur Kuch</option>
+    </select>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="editCancel">Cancel</button>
+      <button type="button" class="m-save" id="editSave">Save</button>
+    </div>
+    <input type="text" id="editNote" maxlength="60" placeholder="📝 Note (optional — jaise: dost ke sath)" autocomplete="off">
+    <div class="mrow" style="margin-top:8px;">
+      <button type="button" class="tool-btn" id="photoAddBtn" style="flex:1;">📸 Bill photo jodo</button>
+      <input type="file" id="photoInput" hidden accept="image/*">
+      <button type="button" class="tool-btn m-danger-like" id="photoDelBtn" hidden>🗑️ Photo hatao</button>
+    </div>
+  </div>
+</div>
+
+<!-- Preset modal -->
+<div class="modal-overlay" id="presetModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">⚡ Quick preset banao</div>
+    <input type="text" id="presetName" maxlength="40" data-i18n-ph="namePh" placeholder="Kharche ka naam" autocomplete="off">
+    <div class="mrow">
+      <input type="number" id="presetAmount" min="1" step="any" inputmode="decimal" placeholder="Rakam ₹">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="presetCancel">Cancel</button>
+      <button type="button" class="m-save" id="presetSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Budget modal -->
+<div class="modal-overlay" id="budgetModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">🎯 Category Budgets</div>
+    <div id="budgetBody"></div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="budgetCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-save" id="budgetSave" data-i18n="budgetSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal modal -->
+<div class="modal-overlay" id="goalModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="goalTitle">🎯 Is mahine ka kharcha-maksad</div>
+    <p class="confirm-msg" data-i18n="goalHelp">Is mahine aap itne se zyada kharch nahi karna chahte. Khali = maksad nahi.</p>
+    <input type="number" id="goalInput" min="1" step="any" inputmode="decimal" data-i18n-ph="goalPh" placeholder="Maksad (₹)">
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="goalCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-save" id="goalSave" data-i18n="budgetSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cloud backup modal -->
+<div class="modal-overlay" id="cloudModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="cloudTitle">☁️ Cloud Backup (Firebase)</div>
+    <p class="confirm-msg" style="font-size:.78rem;" data-i18n="cloudHelp">Ek baar setup: Firebase me free project banao → Realtime Database → test mode rules → uska URL yaha daalo. Phir apna khud ka secret code chunо — data usi code ke niche save hoga (naye phone me wahi code daalo).</p>
+    <input type="text" id="cloudUrlInput" placeholder="Database URL (https://...firebaseio.com)">
+    <input type="text" id="cloudCode" placeholder="Secret code (jaise: keshu123)">
+    <div class="modal-actions">
+      <label class="auto-cloud-toggle">
+        <input type="checkbox" id="autoCloudChk">
+        <span data-i18n="autoCloudLabel">☁️ Har kharcha khud cloud par save ho jaye</span>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="cloudCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-save" id="cloudSaveBtn" data-i18n="cloudSaveBtn">☁️ Save</button>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="tool-btn" id="cloudLoadBtn" style="width:100%;" data-i18n="cloudLoadBtn">⬇️ Cloud se lao</button>
+    </div>
+  </div>
+</div>
+
+<!-- Custom category modal -->
+<div class="modal-overlay" id="catModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="catModalTitle">➕ Nayi category jodein</div>
+    <input type="text" id="catNameInput" maxlength="14" data-i18n-ph="catNamePh" placeholder="Naam (jaise: Mandir, School Fees)" autocomplete="off">
+    <input type="text" id="catIconInput" maxlength="2" data-i18n-ph="catIconPh" placeholder="Emoji (jaise: 🏠)">
+    <div class="cat-del-row" id="catDelRow"></div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="catCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-save" id="catSave" data-i18n="catSave">Jodein</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN settings modal -->
+<div class="modal-overlay" id="pinModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" id="pinTitle">🔒 PIN</div>
+    <p class="confirm-msg" id="pinHelp"></p>
+    <input type="password" id="pinInput" maxlength="4" inputmode="numeric" placeholder="4 digit PIN" autocomplete="off">
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="pinCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-danger" id="pinRemove" hidden>🗑️ Remove</button>
+      <button type="button" class="m-save" id="pinSave" data-i18n="budgetSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Income modal -->
+<div class="modal-overlay" id="incomeModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="incomeTitle">💰 Paisa aaya (Income)</div>
+    <input type="number" id="incomeAmt" min="1" step="any" inputmode="decimal" data-i18n-ph="incomePh" placeholder="Kitne paise aaye? (₹)">
+    <input type="text" id="incomeNote" maxlength="30" data-i18n-ph="incomeNotePh" placeholder="Note (optional — jaise: Papa ne diye)">
+    <div class="income-list" id="incomeList"></div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="incomeCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-save" id="incomeSave" data-i18n="incomeSave">Joda</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cycle modal -->
+<div class="modal-overlay" id="cycleModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="cycleTitle">📅 Bajet cycle ka din</div>
+    <p class="confirm-msg" data-i18n="cycleHelp">Aapka mahina kis tarikh se shuru hota hai? (1-28. Jaise: paisa 5 ko aata hai → 5 likhein)</p>
+    <input type="number" id="cycleInput" min="1" max="28" step="1" inputmode="numeric" placeholder="1-28">
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="cycleCancel" data-i18n="cancel">Cancel</button>
+      <button type="button" class="m-save" id="cycleSave" data-i18n="budgetSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Welcome modal -->
+<div class="modal-overlay" id="welcomeModal" hidden>
+  <div class="modal-card welcome-card">
+    <div class="w-emoji">🎉</div>
+    <div class="w-title" id="welcomeTitle">Welcome to Keshu first app!</div>
+    <div class="w-sub" id="welcomeSub"></div>
+    <button type="button" class="m-save" id="welcomeOk" style="width:100%;">Shuru karo 🚀</button>
+  </div>
+</div>
+
+<!-- Lock screen -->
+<div class="lock-overlay" id="lockOverlay" hidden>
+  <div class="lock-box" id="lockBox">
+    <div class="lock-emoji">🔒</div>
+    <div class="lock-title" data-i18n="lockTitle">App lock hai</div>
+    <div class="lock-dots" id="lockDots">○ ○ ○ ○</div>
+    <div class="lock-pad" id="lockPad"></div>
+    <div class="lock-msg" id="lockMsg"></div>
+    <button type="button" class="lock-forgot" id="lockForgot">PIN bhool gaye?</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

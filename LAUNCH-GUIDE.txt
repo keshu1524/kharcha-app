@@ -1,0 +1,77 @@
+🚀 KHARCHA TRACKER — LAUNCH GUIDE (Hindi)
+App version: v11 (cache kharcha-tracker-v11)
+
+═══════════════════════════════════════
+STEP 1: APP KO INTERNET PAR LAYEIN (FREE)
+═══════════════════════════════════════
+1. Browser me kholо: https://app.netlify.com (login karо, free)
+2. Mere sabhi sites → Site ko kholо → Left side "Deploys" dabayein
+3. Apne PC me folder kholо:
+   C:\Users\Hp\OneDrive\Documents\kharcha app
+4. Isa poora folder — jab tak folder ka different naam —
+   mouse se Drag karо → netlify Deploys tab par Drop karо
+5. Aisa "Publish deploy" rahega! — 30-60 sec me
+6. Site URL mil jayega (top par) ✓
+
+STEP 2: PHONE ME APP LAYEIN (PWA install — FREE)
+═══════════════════════════════════════
+1. Phone me Chrome me website kholо (URL above)
+2. Menu (⋮ top right) → "Add to Home Screen" / "Install app"
+3. Icon aayega — app sach me phone ka hisab ki tarah chalega
+4. DATA apne phone me hi safe hai (offline bhi chalega)
+
+STEP 3: OFFLINE CHECK
+═══════════════════════════════════════
+1. Offline mode — WiFi/Data OFF karо
+2. App kholо — visible lagbhag virtually sab data!
+3. App band karо aur dobara kholо — naya data WOHI rahega?
+
+STEP 4: PLAY STORE (optional — paid $25 one time)
+═══════════════════════════════════════
+- Play Store: $25 developer account — Badhiya lao
+- Direct APK install w/ APK-in: Powerful full header ✓
+
+═══════════════════════════════════════
+DAILY ROUTINE
+═══════════════════════════════════════
+1. Har kharcha log karо: app kholо + na naam + paisa
+   (ya ⚡ Preset: Chai ₹30 = 1 tap! / 🎤 bol ke!)
+2. Roz sab data save: ☁️ ON or auto-cloud ON → khud!
+3. Har hafte: 📤 Share se pehle → hogna + Pappa report
+4. Har mahine: 📊 Excel file download karke dhyan me rakho
+5. Apne phone backup: 📥 Backup file ko WhatsApp par apne
+   bhaиje — kabhi bhi電話・badalо — bhi data safed hai!!
+
+═══════════════════════════════════════
+RAPCHI BARE FEATURES (v12 update)
+═══════════════════════════════════════
+🔥 Streak: roz log karne par badge (🥉🥈🥇trophy)
+📅 Is Hafte tab + 🥧 Pie chart (pichhle me se circle chart)
+📥 Excel/CSV download — saare profiles ek file me
+🎁 Is saal ka poora hisaab (12 mahine)
+☁️ Auto-Cloud save (checkbox ON — har kharcha 15 sec me apne aap cloud par)
+⏪ UNDO: kharcha delete karne par 6 second tak "↩️ Wapas lao" button! (galat delete ka tension khatam!)
+✅ Paisa Aaya (+ button, total card ke side): Salary/income record + history
+📝 Note field: kharche par chhota note (edit ✏️ me)
+📸 Bill photo: kharche ki cash receipt photo attach karо (edit ✏️ me)
+⚙️ Settings (⚙️ button top): 
+   • Salary cycle date (jaise mahina 5 tarikh se)
+   • Recurring kharcha — rent/recharge HAR MAHINE auto-add! (delete karо to band)
+   • 🔔 Notification bell permission
+🎤 कॉमेंट microfia (Chrome/Android)
+🔐 PIN lock (top bar 🔒)
+🎉 Welcome popup: app khulne par "Welcome to Keshu first app!" (din me 1 baar, time ke hisab se greeting)
+
+═══════════════════════════════════════
+PROBLEMS?
+═══════════════════════════════════════
+- Phone me purana app dikhe tab: Recent Apps se swipe close +
+  dobara kholо — cache v11 fresh chalega
+- Lego pc tr村落 phone ab on karo — ek baar net ON karo sab
+  sync ho jayega
+- Data gayab dikhe? Phone me net check karо → Chrome Chrome
+  browser cookies malware sab data SECURITY? Chrome Settings me
+  site data clear na karein!!
+- Saviour ka 📥 backup file KONO bhi phone me restore karо!
+
+Saara data aapka hai aapke paas — phone + cloud + file (3 jagaha)! 💰
