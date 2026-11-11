@@ -1,5 +1,5 @@
 /* Keshu Kharcha Tracker Service Worker - app ko offline bhi chalata hai */
-var CACHE_NAME = 'kharcha-tracker-v17';
+var CACHE_NAME = 'kharcha-tracker-v18';
 var ASSETS = [
   './',
   './index.html',
@@ -10,11 +10,13 @@ var ASSETS = [
   './icons/icon-512.png'
 ];
 
-// Install: sab assets cache karo
+// Install: sab assets cache karo (cache:'reload' = purana HTTP-cache ignore, hamesha fresh)
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(ASSETS);
+      return Promise.all(ASSETS.map(function (u) {
+        return cache.add(new Request(u, { cache: 'reload' }));
+      }));
     }).then(function () {
       return self.skipWaiting();
     })
@@ -35,9 +37,29 @@ self.addEventListener('activate', function (event) {
   );
 });
 
-// Fetch: pehle cache se, warna network se (aur save karo)
+// Fetch: app khulna (navigate) = PEHLE NETWORK (update turant milega), offline = cache
+// Baaki files (css/js/icons) = cache-first (offline speed)
 self.addEventListener('fetch', function (event) {
   if (event.request.method !== 'GET') return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).then(function (response) {
+        if (response && response.status === 200 && response.type === 'basic') {
+          var copy = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put('./index.html', copy);
+          });
+        }
+        return response;
+      }).catch(function () {
+        // Offline: cached app kholо
+        return caches.match('./index.html', { ignoreSearch: true });
+      })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then(function (cached) {
       if (cached) return cached;
@@ -50,7 +72,6 @@ self.addEventListener('fetch', function (event) {
         }
         return response;
       }).catch(function () {
-        // Offline fallback
         return caches.match('./index.html');
       });
     })
