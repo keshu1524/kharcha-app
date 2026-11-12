@@ -224,6 +224,7 @@ var T = {
     udSettle: '✓ Settle', udSettledTag: '✅ Settled',
     shopSaved: '🛒 List me jod diya:', shopBad: '⚠️ Saman ka naam likhein', shopDeleted: '🗑️ List se hata diya', shopEmpty: 'List khaali hai — upar se jodо',
     shopConvert: '💰 Kharcha jodo', shopConverted: '⚡ Form me bhar diya — rakam daalo aur Save dabao!',
+    shopQuickSaved: '⚡ saman list me jud gaye!', shopQuickBad: '⚠️ Kuch samajh nahi aaya — aise likho: doodh 40, sabzi 80', shopTotal: '🧮 Kharidne ka total',
     festSaved: '🪔 Festival budget ban gaya:', festBad: '⚠️ Naam aur total budget dono likhein', festDeleted: '🗑️ Festival hata diya (uske kharche list me rehte hain)',
     festSpentOf: 'kharch hua', festSpendSaved: '🪔 Festival me kharcha jud gaya:', festSpendBad: '⚠️ Kharche ka naam aur rakam likhein', festOver: '🚨 Budget se zyada kharch!',
     compareTitle: '📊 Is mahine vs pichle mahine', compareNoPrev: 'Pichle mahine ka data khaali hai — comparison agle mahine se dikhega'
@@ -330,6 +331,7 @@ var T = {
     udSettle: '✓ Settle', udSettledTag: '✅ Settled',
     shopSaved: '🛒 Added to list:', shopBad: '⚠️ Type the item name', shopDeleted: '🗑️ Removed from list', shopEmpty: 'List empty — add above',
     shopConvert: '💰 Add expense', shopConverted: '⚡ Filled in form — type amount and press Save!',
+    shopQuickSaved: '⚡ items added to list!', shopQuickBad: "⚠️ Can't read that — write like: doodh 40, sabzi 80", shopTotal: '🧮 Shopping total',
     festSaved: '🪔 Festival budget created:', festBad: '⚠️ Name and total budget both needed', festDeleted: '🗑️ Festival removed (its expenses stay)',
     festSpentOf: 'spent', festSpendSaved: '🪔 Added to festival:', festSpendBad: '⚠️ Expense name and amount needed', festOver: '🚨 Over budget!',
     compareTitle: '📊 This month vs last', compareNoPrev: 'No data last month — comparison shows from next month'
@@ -892,6 +894,55 @@ document.getElementById('shopAdd').addEventListener('click', function () {
   renderShop();
   showToast(t('shopSaved') + ' ' + nm);
 });
+// ⚡ Ek line me multiple saman: "doodh 40, sabzi 80, chai 15" → 3 items
+function parseQuickList(raw) {
+  var out = [];
+  var parts = raw.split(/[,;\n।]+/);
+  if (parts.length > 1) {
+    parts.forEach(function (part) {
+      var s = part.trim();
+      if (!s) return;
+      var pm = s.match(/^(.+?)\s+([\d][\d.,]*)$/) || s.match(/^([\d][\d.,]*)\s+(.+)$/);
+      if (pm) {
+        var amtFirst = /^[\d]/.test(pm[1]);
+        var nm = (amtFirst ? pm[2] : pm[1]).trim();
+        var a = parseFloat((amtFirst ? pm[1] : pm[2]).replace(/,/g, ''));
+        out.push({ name: nm, amt: (a > 0 ? a : null) });
+      } else {
+        out.push({ name: s, amt: null });
+      }
+    });
+    return out;
+  }
+  // koi comma nahi: "doodh 40 sabzi 80 anda 60" — pair-regex
+  var re = /([^\d,;\n]+?)\s+([\d][\d.,]*)/g, m, last = 0;
+  while ((m = re.exec(raw)) !== null) {
+    var nm2 = m[1].replace(/^[\s]+/, '').trim();
+    var a2 = parseFloat(m[2].replace(/,/g, ''));
+    if (nm2) out.push({ name: nm2, amt: (a2 > 0 ? a2 : null) });
+    last = re.lastIndex;
+  }
+  var tail = raw.slice(last).trim();
+  if (tail && /[a-zA-Z\u0900-\u097F]/.test(tail)) out.push({ name: tail, amt: null });
+  return out;
+}
+document.getElementById('shopQuickAdd').addEventListener('click', function () {
+  var raw = document.getElementById('shopQuick').value.trim();
+  if (!raw) { showToast(t('shopQuickBad')); return; }
+  var items = parseQuickList(raw);
+  if (items.length === 0) { showToast(t('shopQuickBad')); return; }
+  var p = prof();
+  items.forEach(function (it) {
+    p.shopping.push({ id: Date.now() + Math.floor(Math.random() * 900), name: it.name, amt: it.amt, done: false });
+  });
+  saveDB();
+  document.getElementById('shopQuick').value = '';
+  renderShop();
+  showToast('⚡ ' + items.length + ' ' + t('shopQuickSaved'));
+});
+document.getElementById('shopQuick').addEventListener('keydown', function (ev) {
+  if (ev.key === 'Enter') { ev.preventDefault(); document.getElementById('shopQuickAdd').click(); }
+});
 function renderShop() {
   var host = document.getElementById('shopList');
   var list = (prof().shopping || []).slice().sort(function (a, b) {
@@ -899,11 +950,15 @@ function renderShop() {
     return b.id - a.id;
   });
   if (list.length === 0) { host.innerHTML = '<div class="set-label">' + t('shopEmpty') + '</div>'; return; }
+  var pendingTotal = 0, hasAmt = false;
+  list.forEach(function (it) { if (!it.done && it.amt > 0) { pendingTotal += it.amt; hasAmt = true; } });
   var html = '';
+  if (hasAmt) html += '<div class="set-label">' + t('shopTotal') + ': <b style="color:var(--accent)">' + fmt(pendingTotal) + '</b></div>';
   list.forEach(function (it) {
     html += '<div class="income-row" style="gap:8px;">' +
       '<button type="button" class="shop-tick' + (it.done ? ' done' : '') + '" data-shtick="' + it.id + '" title="' + (it.done ? 'Wapas kholо' : 'Kharid liya ✓') + '">' + (it.done ? '✓' : '') + '</button>' +
-      '<span class="shop-name' + (it.done ? ' done' : '') + '" style="flex:1;">' + escapeHtml(it.name) + '</span>' +
+      '<span class="shop-name' + (it.done ? ' done' : '') + '" style="flex:1;">' + escapeHtml(it.name) +
+      (it.amt > 0 ? ' <span class="shop-amt">₹' + it.amt + '</span>' : '') + '</span>' +
       (it.done ? '<button type="button" class="shop-conv" data-shconv="' + it.id + '" title="' + t('shopConvert') + '">' + t('shopConvert') + '</button>' : '') +
       '<button type="button" class="i-del" data-shdel="' + it.id + '">✕</button>' +
       '</div>';
@@ -929,8 +984,8 @@ document.getElementById('shopList').addEventListener('click', function (ev) {
       saveDB();
       shopModal.hidden = true;
       nameInput.value = item.name;
-      amountInput.value = '';
-      amountInput.focus();
+      amountInput.value = (item.amt > 0 ? item.amt : '');
+      (item.amt > 0 ? nameInput : amountInput).focus();
       renderShop();
       showToast(t('shopConverted'));
     }
