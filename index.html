@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Kharcha">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Keshu Kharcha Tracker 💰</title>
-<link rel="stylesheet" href="styles.css?v=21">
+<link rel="stylesheet" href="styles.css?v=22">
 </head>
 <body>
 <div class="app">
@@ -160,9 +160,21 @@
 
   <!-- Family tools: udhaar / shopping / festival -->
   <div class="tools-row">
-    <button type="button" class="tool-btn" id="udhaarBtn" title="🤝 Udhaar Khata: kisi ko diya/liye paise ka hisaab">🤝 Udhaar</button>
-    <button type="button" class="tool-btn" id="shopBtn" title="🛒 Shopping List: bazaar ka saman yaad rakho">🛒 List</button>
-    <button type="button" class="tool-btn" id="festBtn" title="🪔 Festival Budget: Diwali/Shadi ka alag budget">🪔 Festival</button>
+    <button type="button" class="tool-tile tt-udhaar" id="udhaarBtn" title="🤝 Udhaar Khata: kisi ko diya/liye paise ka hisaab">
+      <span class="tt-emoji">🤝</span>
+      <span class="tt-label">Udhaar</span>
+      <span class="tt-sub">Diya / Liya</span>
+    </button>
+    <button type="button" class="tool-tile tt-shop" id="shopBtn" title="🛒 Shopping List: bazaar ka saman yaad rakho">
+      <span class="tt-emoji">🛒</span>
+      <span class="tt-label">Shopping</span>
+      <span class="tt-sub">Saman list</span>
+    </button>
+    <button type="button" class="tool-tile tt-fest" id="festBtn" title="🪔 Festival Budget: Diwali/Shadi ka alag budget">
+      <span class="tt-emoji">🪔</span>
+      <span class="tt-label">Festival</span>
+      <span class="tt-sub">Budget bar</span>
+    </button>
   </div>
 
   <!-- Tabs -->
@@ -510,6 +522,6 @@
   </div>
 </div>
 
-<script src="app.js?v=21"></script>
+<script src="app.js?v=22"></script>
 </body>
 </html>

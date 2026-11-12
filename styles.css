@@ -311,8 +311,20 @@ header p { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
   margin-top: 8px; line-height: 1.4;
 }
 .w-sub { font-size: 0.85rem; color: var(--muted); margin: 6px 0 14px; font-weight: 600; }
-.tools-row { display: flex; gap: 8px; margin: 10px 0 2px; }
-.tools-row .tool-btn { flex: 1; font-size: 0.78rem; padding: 9px 4px; white-space: nowrap; }
+.tools-row { display: flex; gap: 10px; margin: 12px 0 4px; }
+.tool-tile {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border-radius: 16px; padding: 12px 4px 10px; cursor: pointer;
+  font-family: inherit; transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+.tool-tile:active { transform: scale(0.95); }
+.tt-emoji { font-size: 1.7rem; line-height: 1; }
+.tt-label { font-size: 0.8rem; font-weight: 800; }
+.tt-sub { font-size: 0.6rem; font-weight: 600; color: var(--muted); }
+.tt-udhaar { background: rgba(245, 158, 11, 0.14); border: 1.5px solid rgba(245, 158, 11, 0.45); }
+.tt-shop { background: rgba(22, 163, 74, 0.13); border: 1.5px solid rgba(22, 163, 74, 0.45); }
+.tt-fest { background: rgba(124, 58, 237, 0.13); border: 1.5px solid rgba(124, 58, 237, 0.45); }
 .ud-dir-btn { opacity: 0.55; }
 .ud-dir-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); font-weight: 800; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15); }
 .shop-tick {
