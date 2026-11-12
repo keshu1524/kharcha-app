@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Kharcha">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Keshu Kharcha Tracker 💰</title>
-<link rel="stylesheet" href="styles.css?v=20">
+<link rel="stylesheet" href="styles.css?v=21">
 </head>
 <body>
 <div class="app">
@@ -147,7 +147,7 @@
     <div class="row">
       <div class="field">
         <label for="amount" data-i18n="amountLabel">Rakam (₹)</label>
-        <input type="number" id="amount" placeholder="0" min="1" step="any" inputmode="decimal" required>
+        <input type="text" id="amount" placeholder="0 (ya 50+30)" inputmode="decimal" autocomplete="off" required>
       </div>
       <div class="field">
         <label for="date" data-i18n="dateLabel">Tarikh</label>
@@ -157,6 +157,13 @@
     <button type="submit" class="add-btn" data-i18n="addBtn">Kharcha Jodein</button>
     <div class="presets-row" id="presetsRow"></div>
   </form>
+
+  <!-- Family tools: udhaar / shopping / festival -->
+  <div class="tools-row">
+    <button type="button" class="tool-btn" id="udhaarBtn" title="🤝 Udhaar Khata: kisi ko diya/liye paise ka hisaab">🤝 Udhaar</button>
+    <button type="button" class="tool-btn" id="shopBtn" title="🛒 Shopping List: bazaar ka saman yaad rakho">🛒 List</button>
+    <button type="button" class="tool-btn" id="festBtn" title="🪔 Festival Budget: Diwali/Shadi ka alag budget">🪔 Festival</button>
+  </div>
 
   <!-- Tabs -->
   <div class="tabs" id="tabs">
@@ -178,6 +185,12 @@
         <button type="button" class="tool-btn" id="budgetBtn" data-i18n="budgetBtn">🎨 Budgets</button>
       </div>
     </div>
+  </div>
+
+  <!-- Month comparison -->
+  <div class="report-card" id="compareCard" hidden>
+    <h2 data-i18n="compareTitle">📊 Is mahine vs pichle mahine</h2>
+    <div id="compareBody"></div>
   </div>
 
   <!-- 6-month chart -->
@@ -265,7 +278,7 @@
     <div class="modal-title">✏️ <span data-i18n="formTitle">Naya Kharcha</span></div>
     <input type="text" id="editName" maxlength="40" data-i18n-ph="namePh" placeholder="Kharche ka naam" autocomplete="off">
     <div class="mrow">
-      <input type="number" id="editAmount" min="1" step="any" inputmode="decimal" data-i18n-ph="amountLabel" placeholder="Rakam">
+      <input type="text" id="editAmount" placeholder="Rakam (ya 50+30)" inputmode="decimal" autocomplete="off" data-i18n-ph="amountLabel">
       <input type="date" id="editDate">
     </div>
     <div class="modal-label" data-i18n="catLabel">Category</div>
@@ -424,6 +437,67 @@
   </div>
 </div>
 
+<!-- Udhaar Khata modal -->
+<div class="modal-overlay" id="udhaarModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">🤝 Udhaar Khata</div>
+    <div class="mrow">
+      <input type="text" id="udName" maxlength="20" placeholder="Kis ko / kis se? (Ramesh, dukan)" autocomplete="off">
+      <input type="text" id="udAmount" inputmode="decimal" placeholder="₹" autocomplete="off">
+    </div>
+    <div class="mrow" style="margin-top:8px;">
+      <button type="button" class="tool-btn ud-dir-btn active" id="udDiya" style="flex:1;">💸 Diya (mere se gaya)</button>
+      <button type="button" class="tool-btn ud-dir-btn" id="udLiya" style="flex:1;">🤲 Liya (mere paas aaya)</button>
+    </div>
+    <input type="date" id="udDate" style="margin-top:8px;">
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="udCancel">Band karo</button>
+      <button type="button" class="m-save" id="udSave">🤝 Udhaar jodo</button>
+    </div>
+    <div class="income-history" id="udList"></div>
+  </div>
+</div>
+
+<!-- Shopping List modal -->
+<div class="modal-overlay" id="shopModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">🛒 Shopping List</div>
+    <div class="mrow">
+      <input type="text" id="shopName" maxlength="30" placeholder="Saman ka naam (doodh, sabzi...)" autocomplete="off">
+      <button type="button" class="m-save" id="shopAdd" style="flex:none;">➕ Jodo</button>
+    </div>
+    <div class="income-history" id="shopList"></div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="shopCancel">Band karo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Festival Budget modal -->
+<div class="modal-overlay" id="festModal" hidden>
+  <div class="modal-card">
+    <div class="modal-title">🪔 Festival Budget</div>
+    <div class="mrow">
+      <input type="text" id="festName" maxlength="20" placeholder="Festival ka naam (Diwali, Shadi)" autocomplete="off">
+      <input type="text" id="festTotal" inputmode="decimal" placeholder="Total ₹" autocomplete="off">
+    </div>
+    <button type="button" class="m-save" id="festAdd" style="width:100%;">🪔 Festival banao</button>
+    <div class="income-history" id="festList"></div>
+    <div id="festSpendForm" hidden>
+      <div class="set-label">💰 <span id="festSpendTitle"></span> me kharcha jodo</div>
+      <input type="text" id="festSpendName" maxlength="30" placeholder="Kis cheez par? (mithai, decoration)" autocomplete="off">
+      <div class="mrow" style="margin-top:6px;">
+        <input type="text" id="festSpendAmt" inputmode="decimal" placeholder="₹" autocomplete="off">
+        <input type="date" id="festSpendDate">
+      </div>
+      <button type="button" class="m-save" id="festSpendSave" style="width:100%;">💰 Kharcha save karo</button>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="m-cancel" id="festCancel">Band karo</button>
+    </div>
+  </div>
+</div>
+
 <!-- Lock screen -->
 <div class="lock-overlay" id="lockOverlay" hidden>
   <div class="lock-box" id="lockBox">
@@ -436,6 +510,6 @@
   </div>
 </div>
 
-<script src="app.js?v=20"></script>
+<script src="app.js?v=21"></script>
 </body>
 </html>

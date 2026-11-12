@@ -311,6 +311,37 @@ header p { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
   margin-top: 8px; line-height: 1.4;
 }
 .w-sub { font-size: 0.85rem; color: var(--muted); margin: 6px 0 14px; font-weight: 600; }
+.tools-row { display: flex; gap: 8px; margin: 10px 0 2px; }
+.tools-row .tool-btn { flex: 1; font-size: 0.78rem; padding: 9px 4px; white-space: nowrap; }
+.ud-dir-btn { opacity: 0.55; }
+.ud-dir-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); font-weight: 800; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15); }
+.shop-tick {
+  border: none; background: var(--soft2); color: var(--muted);
+  border-radius: 50%; width: 26px; height: 26px; cursor: pointer;
+  font-size: 0.8rem; flex-shrink: 0; font-family: inherit; font-weight: 800;
+}
+.shop-tick.done { background: var(--accent); color: #fff; }
+.shop-name.done { text-decoration: line-through; opacity: 0.55; }
+.shop-conv {
+  border: none; background: var(--soft2); color: var(--accent);
+  border-radius: 8px; padding: 4px 8px; cursor: pointer;
+  font-family: inherit; font-size: 0.68rem; font-weight: 800;
+}
+.fest-bar-wrap { height: 8px; border-radius: 6px; background: var(--soft2); overflow: hidden; margin: 4px 0 6px; }
+.fest-bar { height: 100%; border-radius: 6px; background: #16a34a; transition: width 0.3s; }
+.cmp-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 2px; border-bottom: 1px dashed var(--line); font-size: 0.8rem;
+}
+.cmp-row:last-child { border-bottom: none; }
+.cmp-badge-up { color: #ef4444; font-weight: 800; white-space: nowrap; }
+.cmp-badge-down { color: #16a34a; font-weight: 800; white-space: nowrap; }
+.cmp-mid { color: var(--muted); font-size: 0.72rem; }
+.fest-badge {
+  font-size: 0.62rem; background: var(--soft2); border-radius: 8px;
+  padding: 1px 6px; margin-left: 6px; font-weight: 700; color: var(--muted);
+  white-space: nowrap; display: inline-block;
+}
 .w-quote {
   font-size: 0.82rem; font-style: italic; font-weight: 700;
   color: var(--accent); background: var(--soft2);

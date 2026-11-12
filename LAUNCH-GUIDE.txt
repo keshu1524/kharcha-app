@@ -63,6 +63,16 @@ RAPCHI BARE FEATURES (v12 update)
 🎉 Welcome popup: app khulne par "Welcome to Keshu first app!" (pehli baar NAAM poochta hai, save karta hai — fir har baar naam ke saath "Wapas swagat, <naam>!") + 💡 har baar ek nayi MOTIVATIONAL LINE — naam Settings ⚙️ me badal sakte ho
 
 ═══════════════════════════════════════
+FAMILY TOOLS (v21 update — form ke neeche 3 naye buttons)
+═══════════════════════════════════════
+🤝 UDHAAR KHATA: kisi ko diya/liya paise ka hisaab — "Ramesh ko ₹500 diye" → ✓ Settle dabao jab wapas mile. Upar summary: kitna diya (wapas lena hai), kitna liya (dena hai)
+🛒 SHOPPING LIST: bazaar ka saman list me daalo → kharidte hi ✓ tick → "💰 Kharcha jodo" dabao → kharcha form me bhar jayega, sirf rakam daalo
+🪔 FESTIVAL BUDGET: Diwali/Shadi/birthday ka alag budget — progress bar dikhega (green/amber/red) — us festival ke kharche list me 🪔 badge ke saath dikhte hain
+⚡ SMART QUICK ADD: naam box me "chai 50" ya "50 chai" likho — rakam khud pakad lega! (Rakam box khaali chhodna hai)
+🧮 CALCULATOR: Rakam box me seedha hisaab likho: "50+30+20" → ₹100 khud ban jayega (box chhodo to calculate hota hai)
+📊 IS MAHINE VS PICHLE: Ye Mahina tab me naya card — kis category me 🔺 kitna badha / 🔻 kitna bacha
+
+═══════════════════════════════════════
 PROBLEMS?
 ═══════════════════════════════════════
 - Phone me purana app dikhe tab: Recent Apps se swipe close +

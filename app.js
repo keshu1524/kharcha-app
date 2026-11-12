@@ -6,7 +6,7 @@ var SETTINGS_KEY = 'kharcha_settings_v1';
 var BANNER_KEY = 'kharcha_banner_skipped_v1';
 
 function emptyProfile() {
-  return { money: null, expenses: [], incomes: [], presets: [], budgets: {} };
+  return { money: null, expenses: [], incomes: [], presets: [], budgets: {}, udhaar: [], shopping: [], festivals: [] };
 }
 
 function loadDB() {
@@ -99,6 +99,9 @@ function prof() {
   if (!p.budgets || typeof p.budgets !== 'object') p.budgets = {};
   if (!(typeof p.goal === 'number' && p.goal > 0)) p.goal = null;
   if (!Array.isArray(p.incomes)) p.incomes = [];
+  if (!Array.isArray(p.udhaar)) p.udhaar = [];
+  if (!Array.isArray(p.shopping)) p.shopping = [];
+  if (!Array.isArray(p.festivals)) p.festivals = [];
   return p;
 }
 prof();
@@ -214,7 +217,16 @@ var T = {
     notifOk: '🔔 Notification ON — ab app khulne par yaad milega', notifNo: '⚠️ Phone ne permission nahi di — Chrome settings me allow karein',
     notifBody: 'Aaj ka koi kharcha nahi — log karо!',
     greetMorning: '🌅 Nayi subah, naya hisaab!', greetAfternoon: '🌤️ Namaste!', greetEvening: '🌆 Shubh sandhya!',
-    welcomeBtn: 'Shuru karo 🚀', userNamePh: 'Aapka naam likho (jaise: Keshu)', nameSaved: 'naam save ho gaya! 🎉'
+    welcomeBtn: 'Shuru karo 🚀', userNamePh: 'Aapka naam likho (jaise: Keshu)', nameSaved: 'naam save ho gaya! 🎉',
+    quickAdd: '⚡ Smart add', calcBad: '⚠️ Ye hisaab samajh nahi aaya (jaise: 50+30)', calcDone: '🧮',
+    udhaarSaved: '🤝 Udhaar likh diya:', udhaarBad: '⚠️ Naam aur rakam dono likhein', udhaarSettled: '✅ Settle ho gaya — hisaab barabar!', udhaarDeleted: '🗑️ Udhaar entry hata di',
+    udDiyaTotal: '💸 Maine diya (wapas lena hai)', udLiyaTotal: '🤲 Maine liya (wapas dena hai)', udhaarEmpty: 'Abhi koi udhaar nahi — 🤝 button se jodо',
+    udSettle: '✓ Settle', udSettledTag: '✅ Settled',
+    shopSaved: '🛒 List me jod diya:', shopBad: '⚠️ Saman ka naam likhein', shopDeleted: '🗑️ List se hata diya', shopEmpty: 'List khaali hai — upar se jodо',
+    shopConvert: '💰 Kharcha jodo', shopConverted: '⚡ Form me bhar diya — rakam daalo aur Save dabao!',
+    festSaved: '🪔 Festival budget ban gaya:', festBad: '⚠️ Naam aur total budget dono likhein', festDeleted: '🗑️ Festival hata diya (uske kharche list me rehte hain)',
+    festSpentOf: 'kharch hua', festSpendSaved: '🪔 Festival me kharcha jud gaya:', festSpendBad: '⚠️ Kharche ka naam aur rakam likhein', festOver: '🚨 Budget se zyada kharch!',
+    compareTitle: '📊 Is mahine vs pichle mahine', compareNoPrev: 'Pichle mahine ka data khaali hai — comparison agle mahine se dikhega'
   },
   en: {
     appTitle: '💰 Keshu Kharcha Tracker', appSub: 'Track daily expenses the easy way',
@@ -311,7 +323,16 @@ var T = {
     notifOk: '🔔 Bell ON — reminder when app opens', notifNo: "⚠️ Phone didn't allow — enable in Chrome settings",
     notifBody: 'Nothing spent today — log it!',
     greetMorning: '☀️ Good morning!', greetAfternoon: '🌤️ Good afternoon!', greetEvening: '🌆 Good evening!',
-    welcomeBtn: "Let's start 🚀", userNamePh: 'Type your name (like: Keshu)', nameSaved: 'name saved! 🎉'
+    welcomeBtn: "Let's start 🚀", userNamePh: 'Type your name (like: Keshu)', nameSaved: 'name saved! 🎉',
+    quickAdd: '⚡ Smart add', calcBad: "⚠️ Can't read that math (like: 50+30)", calcDone: '🧮',
+    udhaarSaved: '🤝 Loan logged:', udhaarBad: '⚠️ Name and amount both needed', udhaarSettled: '✅ Settled — all square!', udhaarDeleted: '🗑️ Loan entry removed',
+    udDiyaTotal: '💸 I gave (to get back)', udLiyaTotal: '🤲 I took (to repay)', udhaarEmpty: 'No loans yet — use 🤝 button',
+    udSettle: '✓ Settle', udSettledTag: '✅ Settled',
+    shopSaved: '🛒 Added to list:', shopBad: '⚠️ Type the item name', shopDeleted: '🗑️ Removed from list', shopEmpty: 'List empty — add above',
+    shopConvert: '💰 Add expense', shopConverted: '⚡ Filled in form — type amount and press Save!',
+    festSaved: '🪔 Festival budget created:', festBad: '⚠️ Name and total budget both needed', festDeleted: '🗑️ Festival removed (its expenses stay)',
+    festSpentOf: 'spent', festSpendSaved: '🪔 Added to festival:', festSpendBad: '⚠️ Expense name and amount needed', festOver: '🚨 Over budget!',
+    compareTitle: '📊 This month vs last', compareNoPrev: 'No data last month — comparison shows from next month'
   }
 };
 function t(key) { return T[settings.lang][key] !== undefined ? T[settings.lang][key] : T.hi[key]; }
@@ -774,6 +795,322 @@ document.getElementById('incomeHistory').addEventListener('click', function (ev)
   showToast(t('incomeDeleted'));
 });
 
+// ================== UDHAAR KHATA ==================
+var udhaarModal = document.getElementById('udhaarModal');
+var udDir = 'diya';
+function paintUdDir() {
+  document.getElementById('udDiya').classList.toggle('active', udDir === 'diya');
+  document.getElementById('udLiya').classList.toggle('active', udDir === 'liya');
+}
+document.getElementById('udhaarBtn').addEventListener('click', function () {
+  document.getElementById('udName').value = '';
+  document.getElementById('udAmount').value = '';
+  document.getElementById('udDate').value = getTodayStr();
+  udDir = 'diya';
+  paintUdDir();
+  renderUdhaar();
+  udhaarModal.hidden = false;
+});
+document.getElementById('udCancel').addEventListener('click', function () { udhaarModal.hidden = true; });
+udhaarModal.addEventListener('click', function (ev) { if (ev.target === udhaarModal) udhaarModal.hidden = true; });
+document.getElementById('udDiya').addEventListener('click', function () { udDir = 'diya'; paintUdDir(); });
+document.getElementById('udLiya').addEventListener('click', function () { udDir = 'liya'; paintUdDir(); });
+document.getElementById('udSave').addEventListener('click', function () {
+  var nm = document.getElementById('udName').value.trim();
+  var amt = parseFloat(document.getElementById('udAmount').value);
+  if (!nm || !(amt > 0)) { showToast(t('udhaarBad')); return; }
+  var p = prof();
+  p.udhaar.push({
+    id: Date.now(), name: nm, amount: amt, dir: udDir,
+    date: document.getElementById('udDate').value || getTodayStr(), settled: false
+  });
+  saveDB();
+  document.getElementById('udName').value = '';
+  document.getElementById('udAmount').value = '';
+  renderUdhaar();
+  showToast(t('udhaarSaved') + ' ' + (udDir === 'diya' ? '💸' : '🤲') + ' ' + nm + ' ' + fmt(amt));
+});
+function renderUdhaar() {
+  var host = document.getElementById('udList');
+  var p = prof();
+  var list = (p.udhaar || []).slice().sort(function (a, b) { return b.id - a.id; });
+  var dSum = 0, lSum = 0;
+  list.forEach(function (u) { if (!u.settled) { if (u.dir === 'diya') dSum += Number(u.amount) || 0; else lSum += Number(u.amount) || 0; } });
+  if (list.length === 0) { host.innerHTML = '<div class="set-label">' + t('udhaarEmpty') + '</div>'; return; }
+  var html = '<div class="set-label">' + t('udDiyaTotal') + ': <b style="color:var(--danger)">' + fmt(dSum) + '</b>' +
+    ' • ' + t('udLiyaTotal') + ': <b style="color:var(--ok)">' + fmt(lSum) + '</b></div>';
+  list.forEach(function (u) {
+    var settledCls = u.settled ? ' shop-name done' : '';
+    html += '<div class="income-row' + settledCls + '">' +
+      '<span>' + (u.dir === 'diya' ? '💸' : '🤲') + ' ' + escapeHtml(u.name) +
+      ' <small style="color:var(--muted)">' + formatDate(u.date) + '</small></span>' +
+      '<span class="i-amt" style="color:' + (u.dir === 'diya' ? 'var(--danger)' : 'var(--ok)') + '">' + fmt(u.amount) + '</span>' +
+      (u.settled
+        ? '<small style="color:var(--muted);font-weight:700;">' + t('udSettledTag') + '</small>'
+        : '<span><button type="button" class="shop-conv" data-udset="' + u.id + '" title="' + t('udSettle') + '">' + t('udSettle') + '</button> ' +
+          '<button type="button" class="i-del" data-uddel="' + u.id + '">✕</button></span>') +
+      '</div>';
+  });
+  host.innerHTML = html;
+}
+document.getElementById('udList').addEventListener('click', function (ev) {
+  var setB = ev.target.closest('[data-udset]');
+  var delB = ev.target.closest('[data-uddel]');
+  var p = prof();
+  if (setB) {
+    var sid = Number(setB.getAttribute('data-udset'));
+    p.udhaar.forEach(function (u) { if (u.id === sid) u.settled = true; });
+    saveDB();
+    renderUdhaar();
+    showToast(t('udhaarSettled'));
+  } else if (delB) {
+    var did = Number(delB.getAttribute('data-uddel'));
+    p.udhaar = p.udhaar.filter(function (u) { return u.id !== did; });
+    saveDB();
+    renderUdhaar();
+    showToast(t('udhaarDeleted'));
+  }
+});
+
+// ================== SHOPPING LIST ==================
+var shopModal = document.getElementById('shopModal');
+document.getElementById('shopBtn').addEventListener('click', function () {
+  document.getElementById('shopName').value = '';
+  renderShop();
+  shopModal.hidden = false;
+  setTimeout(function () { document.getElementById('shopName').focus(); }, 60);
+});
+document.getElementById('shopCancel').addEventListener('click', function () { shopModal.hidden = true; });
+shopModal.addEventListener('click', function (ev) { if (ev.target === shopModal) shopModal.hidden = true; });
+document.getElementById('shopAdd').addEventListener('click', function () {
+  var nm = document.getElementById('shopName').value.trim();
+  if (!nm) { showToast(t('shopBad')); return; }
+  var p = prof();
+  p.shopping.push({ id: Date.now(), name: nm, done: false });
+  saveDB();
+  document.getElementById('shopName').value = '';
+  renderShop();
+  showToast(t('shopSaved') + ' ' + nm);
+});
+function renderShop() {
+  var host = document.getElementById('shopList');
+  var list = (prof().shopping || []).slice().sort(function (a, b) {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return b.id - a.id;
+  });
+  if (list.length === 0) { host.innerHTML = '<div class="set-label">' + t('shopEmpty') + '</div>'; return; }
+  var html = '';
+  list.forEach(function (it) {
+    html += '<div class="income-row" style="gap:8px;">' +
+      '<button type="button" class="shop-tick' + (it.done ? ' done' : '') + '" data-shtick="' + it.id + '" title="' + (it.done ? 'Wapas kholо' : 'Kharid liya ✓') + '">' + (it.done ? '✓' : '') + '</button>' +
+      '<span class="shop-name' + (it.done ? ' done' : '') + '" style="flex:1;">' + escapeHtml(it.name) + '</span>' +
+      (it.done ? '<button type="button" class="shop-conv" data-shconv="' + it.id + '" title="' + t('shopConvert') + '">' + t('shopConvert') + '</button>' : '') +
+      '<button type="button" class="i-del" data-shdel="' + it.id + '">✕</button>' +
+      '</div>';
+  });
+  host.innerHTML = html;
+}
+document.getElementById('shopList').addEventListener('click', function (ev) {
+  var tick = ev.target.closest('[data-shtick]');
+  var conv = ev.target.closest('[data-shconv]');
+  var del = ev.target.closest('[data-shdel]');
+  var p = prof();
+  if (tick) {
+    var tid = Number(tick.getAttribute('data-shtick'));
+    p.shopping.forEach(function (it) { if (it.id === tid) it.done = !it.done; });
+    saveDB();
+    renderShop();
+  } else if (conv) {
+    var cid2 = Number(conv.getAttribute('data-shconv'));
+    var item = null;
+    p.shopping.forEach(function (it) { if (it.id === cid2) item = it; });
+    if (item) {
+      p.shopping = p.shopping.filter(function (it) { return it.id !== cid2; });
+      saveDB();
+      shopModal.hidden = true;
+      nameInput.value = item.name;
+      amountInput.value = '';
+      amountInput.focus();
+      renderShop();
+      showToast(t('shopConverted'));
+    }
+  } else if (del) {
+    var did2 = Number(del.getAttribute('data-shdel'));
+    p.shopping = p.shopping.filter(function (it) { return it.id !== did2; });
+    saveDB();
+    renderShop();
+    showToast(t('shopDeleted'));
+  }
+});
+
+// ================== FESTIVAL BUDGET ==================
+var festModal = document.getElementById('festModal');
+var pendingFest = null;
+document.getElementById('festBtn').addEventListener('click', function () {
+  document.getElementById('festName').value = '';
+  document.getElementById('festTotal').value = '';
+  document.getElementById('festSpendForm').hidden = true;
+  pendingFest = null;
+  renderFest();
+  festModal.hidden = false;
+});
+document.getElementById('festCancel').addEventListener('click', function () { festModal.hidden = true; });
+festModal.addEventListener('click', function (ev) { if (ev.target === festModal) festModal.hidden = true; });
+document.getElementById('festAdd').addEventListener('click', function () {
+  var nm = document.getElementById('festName').value.trim();
+  var tot = parseFloat(document.getElementById('festTotal').value);
+  if (!nm || !(tot > 0)) { showToast(t('festBad')); return; }
+  var p = prof();
+  p.festivals.push({ id: Date.now(), name: nm, total: tot, created: getTodayStr() });
+  saveDB();
+  document.getElementById('festName').value = '';
+  document.getElementById('festTotal').value = '';
+  renderFest();
+  showToast(t('festSaved') + ' ' + nm + ' ' + fmt(tot));
+});
+function festById(id) {
+  var out = null;
+  (prof().festivals || []).forEach(function (f) { if (f.id === id) out = f; });
+  return out;
+}
+function renderFest() {
+  var host = document.getElementById('festList');
+  var list = prof().festivals || [];
+  if (list.length === 0) {
+    host.innerHTML = '<div class="set-label">' + (settings.lang === 'en' ? 'No festival budget yet — make one above 🪔' : 'Abhi koi festival budget nahi — upar se banao 🪔') + '</div>';
+    document.getElementById('festSpendForm').hidden = true;
+    pendingFest = null;
+    return;
+  }
+  var html = '';
+  list.forEach(function (f) {
+    var spent = 0;
+    prof().expenses.forEach(function (e) { if (e.festival === f.id) spent += Number(e.amount) || 0; });
+    var pct = Math.min(Math.round((spent / f.total) * 100), 100);
+    var color = pct >= 100 ? '#ef4444' : (pct >= 70 ? '#f59e0b' : '#16a34a');
+    html += '<div style="padding:6px 2px;border-bottom:1px dashed var(--line);">' +
+      '<div class="income-row" style="border:none;padding:0;">' +
+      '<span>🪔 <b>' + escapeHtml(f.name) + '</b></span>' +
+      '<span class="i-amt" style="color:' + color + '">' + fmt(spent) + ' / ' + fmt(f.total) + (spent > f.total ? ' ' + t('festOver') : '') + '</span>' +
+      '</div>' +
+      '<div class="fest-bar-wrap"><div class="fest-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+      '<div class="income-row" style="border:none;padding:0;">' +
+      '<small style="color:var(--muted);">' + pct + '% ' + t('festSpentOf') + '</small>' +
+      '<span><button type="button" class="shop-conv" data-fadd="' + f.id + '">💰 ' + (settings.lang === 'en' ? 'Add expense' : 'Kharcha jodo') + '</button> ' +
+      '<button type="button" class="i-del" data-fdel="' + f.id + '">✕</button></span>' +
+      '</div></div>';
+  });
+  host.innerHTML = html;
+}
+document.getElementById('festList').addEventListener('click', function (ev) {
+  var addB = ev.target.closest('[data-fadd]');
+  var delB = ev.target.closest('[data-fdel]');
+  var p = prof();
+  if (addB) {
+    var fid = Number(addB.getAttribute('data-fadd'));
+    var f = festById(fid);
+    if (!f) return;
+    pendingFest = fid;
+    document.getElementById('festSpendTitle').textContent = f.name;
+    document.getElementById('festSpendName').value = '';
+    document.getElementById('festSpendAmt').value = '';
+    document.getElementById('festSpendDate').value = getTodayStr();
+    document.getElementById('festSpendForm').hidden = false;
+    setTimeout(function () { document.getElementById('festSpendName').focus(); }, 60);
+  } else if (delB) {
+    var did = Number(delB.getAttribute('data-fdel'));
+    p.festivals = p.festivals.filter(function (f2) { return f2.id !== did; });
+    saveDB();
+    renderFest();
+    showToast(t('festDeleted'));
+  }
+});
+document.getElementById('festSpendSave').addEventListener('click', function () {
+  var f = festById(pendingFest);
+  if (!f) return;
+  var nm = document.getElementById('festSpendName').value.trim();
+  var amt = parseFloat(document.getElementById('festSpendAmt').value);
+  var dt = document.getElementById('festSpendDate').value || getTodayStr();
+  if (!nm || !(amt > 0)) { showToast(t('festSpendBad')); return; }
+  var p = prof();
+  var cid = autoCategory(nm);
+  p.expenses.push({ id: Date.now(), name: nm, amount: amt, date: dt, category: cid, festival: pendingFest });
+  saveDB();
+  document.getElementById('festSpendForm').hidden = true;
+  pendingFest = null;
+  renderFest();
+  render();
+  showToast(t('festSpendSaved') + ' ' + f.name + ' — ' + CATEGORIES[cid].icon + ' ' + fmt(amt));
+});
+function festBadge(e) {
+  if (!e.festival) return '';
+  var f = festById(e.festival);
+  return '<span class="fest-badge">🪔 ' + escapeHtml(f ? f.name : 'Festival') + '</span>';
+}
+
+// ================== AMOUNT CALCULATOR (50+30 = 80) ==================
+function calcEval(input) {
+  var v = input.value.trim();
+  if (!v || !/[+\-*/]/.test(v)) return;
+  if (!/^[0-9+\-*/().\s]+$/.test(v)) { showToast(t('calcBad')); return; }
+  try {
+    var res = Function('"use strict";return (' + v + ')')();
+    if (typeof res === 'number' && isFinite(res) && res > 0) {
+      input.value = Math.round(res * 100) / 100;
+      showToast(t('calcDone') + ' ' + v.replace(/\s+/g, '') + ' = ' + fmt(res));
+    } else {
+      showToast(t('calcBad'));
+    }
+  } catch (err) {
+    showToast(t('calcBad'));
+  }
+}
+amountInput.addEventListener('blur', function () { calcEval(amountInput); });
+document.getElementById('editAmount').addEventListener('blur', function () {
+  var el = document.getElementById('editAmount');
+  calcEval(el);
+});
+
+// ================== MONTH COMPARISON (is vs pichle) ==================
+function renderCompare() {
+  var card = document.getElementById('compareCard');
+  var body = document.getElementById('compareBody');
+  if (!card) return;
+  if (currentFilter !== 'month') { card.hidden = true; return; }
+  var p = prof();
+  if (p.expenses.length === 0) { card.hidden = true; return; }
+  var cur = curCycle(), prev = cycPrev(cur);
+  var cc = {}, pc = {};
+  p.expenses.forEach(function (e) {
+    var c = getCategory(e);
+    var cyc = cycOf(e.date);
+    if (cyc === cur) cc[c] = (cc[c] || 0) + (Number(e.amount) || 0);
+    else if (cyc === prev) pc[c] = (pc[c] || 0) + (Number(e.amount) || 0);
+  });
+  var keys = {};
+  Object.keys(cc).forEach(function (k) { keys[k] = 1; });
+  Object.keys(pc).forEach(function (k) { keys[k] = 1; });
+  var rows = Object.keys(keys).map(function (k) {
+    return { c: k, now: cc[k] || 0, was: pc[k] || 0, delta: (cc[k] || 0) - (pc[k] || 0) };
+  }).filter(function (r) { return r.delta !== 0; });
+  var hadPrev = Object.keys(pc).length > 0;
+  if (rows.length === 0) { card.hidden = true; return; }
+  card.hidden = false;
+  rows.sort(function (a, b) { return Math.abs(b.delta) - Math.abs(a.delta); });
+  var html = '';
+  if (!hadPrev) html += '<div class="set-label">' + t('compareNoPrev') + '</div>';
+  rows.slice(0, 6).forEach(function (r) {
+    var c = CATEGORIES[r.c];
+    var up = r.delta > 0;
+    html += '<div class="cmp-row">' +
+      '<span>' + c.icon + ' ' + escapeHtml(c.label) + '</span>' +
+      '<span class="cmp-mid">' + fmt(r.was) + ' → ' + fmt(r.now) + '</span>' +
+      '<span class="' + (up ? 'cmp-badge-up' : 'cmp-badge-down') + '">' + (up ? '🔺 +' : '🔻 −') + fmt(Math.abs(r.delta)) + '</span>' +
+      '</div>';
+  });
+  body.innerHTML = html;
+}
+
 // ================== SETTINGS MODAL (cycle + recurring + bell) ==================
 var settingsModal = document.getElementById('settingsModal');
 var cycleDayInput = document.getElementById('cycleDayInput');
@@ -925,6 +1262,19 @@ form.addEventListener('submit', function (e) {
   var p = prof();
   var name = nameInput.value.trim();
   var amount = parseFloat(amountInput.value);
+  var quickAddUsed = false;
+  // ⚡ Smart Quick Add: "chai 50" ya "50 chai" — naam me se rakam khud pakdo
+  if (name && amountInput.value.trim() === '') {
+    var qm = name.match(/^(.+?)\s+([\d][\d.,]*)$/) || name.match(/^([\d][\d.,]*)\s+(.+)$/);
+    if (qm) {
+      var qamt = parseFloat(qm[2].replace(/,/g, ''));
+      if (qamt > 0) {
+        name = qm[1].trim();
+        amount = qamt;
+        quickAddUsed = true;
+      }
+    }
+  }
   var date = dateInput.value;
   if (!name || !(amount > 0) || !date) { showToast(t('toastFill')); return; }
   var cid = (categorySelect.value === 'auto') ? autoCategory(name) : categorySelect.value;
@@ -939,7 +1289,7 @@ form.addEventListener('submit', function (e) {
   categorySelect.value = 'auto';
   dateInput.value = getTodayStr();
   nameInput.focus();
-  showToast(t('toastAdded') + ' (' + CATEGORIES[cid].icon + ' ' + fmt(amt) + ')');
+  showToast((quickAddUsed ? t('quickAdd') + ': ' : t('toastAdded') + ' ') + '(' + CATEGORIES[cid].icon + ' ' + fmt(amt) + ')');
 
   // Repeat kharcha detect: 3+ baar same naam -> preset banane ka suggestion
   maybeSuggestPreset(name, amt);
@@ -1389,6 +1739,9 @@ function render() {
     famEl.innerHTML = '<div>' + t('famTotal') + '</div>' +
       '<div class="ft-total">' + fmt(famSum) + '</div>' + rowsHtml;
   }
+
+  // ---- Is mahine vs pichle mahine ----
+  renderCompare();
 
   // ---- List ----
   renderListOnly();
@@ -1897,7 +2250,7 @@ function renderListOnly() {
         '<div class="icon">' + cat.icon + '</div>' +
         '<div class="info">' +
           '<div class="name">' + escapeHtml(e.name) + tag +
-            (e.photo ? '<button type="button" class="photob" data-ph="' + e.id + '" title="Bill photo dekhо">📸</button>' : '') + '</div>' +
+            (e.photo ? '<button type="button" class="photob" data-ph="' + e.id + '" title="Bill photo dekhо">📸</button>' : '') + festBadge(e) + '</div>' +
           (e.note ? '<div class="note-line">📝 ' + escapeHtml(e.note) + '</div>' : '') +
           '<div class="date">' + cat.icon + ' ' + (settings.lang === 'en' ? cat.label : cat.label) +
           ' • 📅 ' + formatDate(e.date) + '</div>' +
