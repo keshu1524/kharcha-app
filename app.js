@@ -226,6 +226,7 @@ var T = {
     shopConvert: '💰 Kharcha jodo', shopConverted: '⚡ Form me bhar diya — rakam daalo aur Save dabao!',
     shopQuickSaved: '⚡ saman list me jud gaye!', shopQuickBad: '⚠️ Kuch samajh nahi aaya — aise likho: doodh 40, sabzi 80', shopTotal: '🧮 Kharidne ka total',
     shopNext: 'Ab ye lena hai',
+    shopAllDone: '✅ Sab kharid liya — badhai!', shopAllOpened: '↩️ Sab wapas pending me',
     festSaved: '🪔 Festival budget ban gaya:', festBad: '⚠️ Naam aur total budget dono likhein', festDeleted: '🗑️ Festival hata diya (uske kharche list me rehte hain)',
     festSpentOf: 'kharch hua', festSpendSaved: '🪔 Festival me kharcha jud gaya:', festSpendBad: '⚠️ Kharche ka naam aur rakam likhein', festOver: '🚨 Budget se zyada kharch!',
     compareTitle: '📊 Is mahine vs pichle mahine', compareNoPrev: 'Pichle mahine ka data khaali hai — comparison agle mahine se dikhega'
@@ -334,6 +335,7 @@ var T = {
     shopConvert: '💰 Add expense', shopConverted: '⚡ Filled in form — type amount and press Save!',
     shopQuickSaved: '⚡ items added to list!', shopQuickBad: "⚠️ Can't read that — write like: doodh 40, sabzi 80", shopTotal: '🧮 Shopping total',
     shopNext: 'Buy this next',
+    shopAllDone: '✅ All bought — well done!', shopAllOpened: '↩️ All back to pending',
     festSaved: '🪔 Festival budget created:', festBad: '⚠️ Name and total budget both needed', festDeleted: '🗑️ Festival removed (its expenses stay)',
     festSpentOf: 'spent', festSpendSaved: '🪔 Added to festival:', festSpendBad: '⚠️ Expense name and amount needed', festOver: '🚨 Over budget!',
     compareTitle: '📊 This month vs last', compareNoPrev: 'No data last month — comparison shows from next month'
@@ -944,6 +946,21 @@ document.getElementById('shopQuickAdd').addEventListener('click', function () {
 });
 document.getElementById('shopQuick').addEventListener('keydown', function (ev) {
   if (ev.key === 'Enter') { ev.preventDefault(); document.getElementById('shopQuickAdd').click(); }
+});
+// ✓ Sab tick karo / ↩️ Sab wapas
+document.getElementById('shopAllTick').addEventListener('click', function () {
+  var p = prof(); var n = 0;
+  p.shopping.forEach(function (it) { if (!it.done) { it.done = true; n++; } });
+  saveDB();
+  renderShop();
+  showToast(n ? n + ' ' + t('shopAllDone') : t('shopEmpty'));
+});
+document.getElementById('shopAllUntick').addEventListener('click', function () {
+  var p = prof(); var n = 0;
+  p.shopping.forEach(function (it) { if (it.done) { it.done = false; n++; } });
+  saveDB();
+  renderShop();
+  showToast(n ? n + ' ' + t('shopAllOpened') : t('shopEmpty'));
 });
 function renderShop() {
   var host = document.getElementById('shopList');

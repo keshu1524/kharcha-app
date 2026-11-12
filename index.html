@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Kharcha">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Keshu Kharcha Tracker 💰</title>
-<link rel="stylesheet" href="styles.css?v=26">
+<link rel="stylesheet" href="styles.css?v=27">
 </head>
 <body>
 <div class="app">
@@ -481,6 +481,10 @@
     <div class="set-label">⚡ Ek line me SAB likho — apne aap jud jayenge:</div>
     <input type="text" id="shopQuick" maxlength="200" placeholder="doodh 40, sabzi 80, chai 15" autocomplete="off">
     <button type="button" class="m-save" id="shopQuickAdd" style="width:100%;">⚡ Sab list me daalo</button>
+    <div class="mrow" style="margin-top:8px;">
+      <button type="button" class="tool-btn" id="shopAllTick" style="flex:1;" title="Sab items kharid liye — ek saath tick">✓ Sab tick karo</button>
+      <button type="button" class="tool-btn" id="shopAllUntick" style="flex:1;" title="Galti ho gayi? Sab wapas kholо">↩️ Sab wapas</button>
+    </div>
     <div class="income-history" id="shopList"></div>
     <div class="modal-actions">
       <button type="button" class="m-cancel" id="shopCancel">Band karo</button>
@@ -525,6 +529,6 @@
   </div>
 </div>
 
-<script src="app.js?v=26"></script>
+<script src="app.js?v=27"></script>
 </body>
 </html>
