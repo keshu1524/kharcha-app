@@ -340,6 +340,16 @@ header p { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
   font-family: inherit; font-size: 0.68rem; font-weight: 800;
 }
 .shop-amt { font-size: 0.72rem; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.shop-sum {
+  background: var(--soft2); border-radius: 12px; padding: 8px 12px;
+  margin-bottom: 8px; font-size: 0.8rem;
+}
+.shop-sum .ss-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 3px 0; gap: 8px;
+}
+.shop-sum .ss-row b { white-space: nowrap; font-size: 0.85rem; }
+.shop-sum .ss-row:first-child b { font-size: 0.95rem; color: var(--accent); }
 .fest-bar-wrap { height: 8px; border-radius: 6px; background: var(--soft2); overflow: hidden; margin: 4px 0 6px; }
 .fest-bar { height: 100%; border-radius: 6px; background: #16a34a; transition: width 0.3s; }
 .cmp-row {

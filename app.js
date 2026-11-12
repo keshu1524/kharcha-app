@@ -950,10 +950,25 @@ function renderShop() {
     return b.id - a.id;
   });
   if (list.length === 0) { host.innerHTML = '<div class="set-label">' + t('shopEmpty') + '</div>'; return; }
-  var pendingTotal = 0, hasAmt = false;
-  list.forEach(function (it) { if (!it.done && it.amt > 0) { pendingTotal += it.amt; hasAmt = true; } });
+  var pendingTotal = 0, doneTotal = 0, hasAmt = false, pendingCount = 0, doneCount = 0;
+  list.forEach(function (it) {
+    if (it.amt > 0) {
+      hasAmt = true;
+      if (it.done) doneTotal += it.amt; else { pendingTotal += it.amt; pendingCount++; }
+    }
+    if (it.done) doneCount++; 
+  });
+  var totalCount = pendingCount + doneCount;
   var html = '';
-  if (hasAmt) html += '<div class="set-label">' + t('shopTotal') + ': <b style="color:var(--accent)">' + fmt(pendingTotal) + '</b></div>';
+  if (hasAmt) {
+    html += '<div class="shop-sum">' +
+      '<div class="ss-row"><span>🧮 ' + t('shopTotal') + '</span><b>' + fmt(pendingTotal + doneTotal) + '</b></div>' +
+      '<div class="ss-row"><span>🛍️ ' + (settings.lang === 'en' ? 'Left to buy' : 'Abhi kharidna hai') + '</span><b style="color:var(--accent)">' + fmt(pendingTotal) + ' <small>(' + pendingCount + ')</small></b></div>' +
+      '<div class="ss-row"><span>✓ ' + (settings.lang === 'en' ? 'Bought' : 'Kharid liya') + '</span><b style="color:var(--ok)">' + fmt(doneTotal) + ' <small>(' + doneCount + ')</small></b></div>' +
+      '</div>';
+  } else {
+    html += '<div class="set-label">🛍️ ' + totalCount + ' ' + (settings.lang === 'en' ? 'items in list' : 'saman list me hai') + '</div>';
+  }
   list.forEach(function (it) {
     html += '<div class="income-row" style="gap:8px;">' +
       '<button type="button" class="shop-tick' + (it.done ? ' done' : '') + '" data-shtick="' + it.id + '" title="' + (it.done ? 'Wapas kholо' : 'Kharid liya ✓') + '">' + (it.done ? '✓' : '') + '</button>' +
