@@ -1,5 +1,5 @@
 /* Keshu Kharcha Tracker Service Worker - app ko offline bhi chalata hai */
-var CACHE_NAME = 'kharcha-tracker-v27';
+var CACHE_NAME = 'kharcha-tracker-v28';
 var ASSETS = [
   './',
   './index.html',

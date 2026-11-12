@@ -344,11 +344,14 @@ header p { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
 .ud-dir-btn { opacity: 0.55; }
 .ud-dir-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); font-weight: 800; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15); }
 .shop-tick {
-  border: none; background: var(--soft2); color: var(--muted);
-  border-radius: 50%; width: 26px; height: 26px; cursor: pointer;
-  font-size: 0.8rem; flex-shrink: 0; font-family: inherit; font-weight: 800;
+  border: 1.5px solid var(--line); background: var(--card); color: transparent;
+  border-radius: 50%; width: 27px; height: 27px; cursor: pointer;
+  font-size: 0.85rem; flex-shrink: 0; font-family: inherit; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+  transition: all 0.15s;
 }
-.shop-tick.done { background: var(--accent); color: #fff; }
+.shop-tick:active { transform: scale(0.9); }
+.shop-tick.done { background: var(--accent); border-color: var(--accent); color: #fff; }
 .shop-name.done { text-decoration: line-through; opacity: 0.55; }
 .shop-conv {
   border: none; background: var(--soft2); color: var(--accent);
