@@ -225,6 +225,7 @@ var T = {
     shopSaved: '🛒 List me jod diya:', shopBad: '⚠️ Saman ka naam likhein', shopDeleted: '🗑️ List se hata diya', shopEmpty: 'List khaali hai — upar se jodо',
     shopConvert: '💰 Kharcha jodo', shopConverted: '⚡ Form me bhar diya — rakam daalo aur Save dabao!',
     shopQuickSaved: '⚡ saman list me jud gaye!', shopQuickBad: '⚠️ Kuch samajh nahi aaya — aise likho: doodh 40, sabzi 80', shopTotal: '🧮 Kharidne ka total',
+    shopNext: 'Ab ye lena hai',
     festSaved: '🪔 Festival budget ban gaya:', festBad: '⚠️ Naam aur total budget dono likhein', festDeleted: '🗑️ Festival hata diya (uske kharche list me rehte hain)',
     festSpentOf: 'kharch hua', festSpendSaved: '🪔 Festival me kharcha jud gaya:', festSpendBad: '⚠️ Kharche ka naam aur rakam likhein', festOver: '🚨 Budget se zyada kharch!',
     compareTitle: '📊 Is mahine vs pichle mahine', compareNoPrev: 'Pichle mahine ka data khaali hai — comparison agle mahine se dikhega'
@@ -332,6 +333,7 @@ var T = {
     shopSaved: '🛒 Added to list:', shopBad: '⚠️ Type the item name', shopDeleted: '🗑️ Removed from list', shopEmpty: 'List empty — add above',
     shopConvert: '💰 Add expense', shopConverted: '⚡ Filled in form — type amount and press Save!',
     shopQuickSaved: '⚡ items added to list!', shopQuickBad: "⚠️ Can't read that — write like: doodh 40, sabzi 80", shopTotal: '🧮 Shopping total',
+    shopNext: 'Buy this next',
     festSaved: '🪔 Festival budget created:', festBad: '⚠️ Name and total budget both needed', festDeleted: '🗑️ Festival removed (its expenses stay)',
     festSpentOf: 'spent', festSpendSaved: '🪔 Added to festival:', festSpendBad: '⚠️ Expense name and amount needed', festOver: '🚨 Over budget!',
     compareTitle: '📊 This month vs last', compareNoPrev: 'No data last month — comparison shows from next month'
@@ -959,11 +961,15 @@ function renderShop() {
     if (it.done) doneCount++; 
   });
   var totalCount = pendingCount + doneCount;
+  var nextBuyId = null, nextBuyName = '';
+  list.forEach(function (it) {
+    if (!it.done && nextBuyId === null) { nextBuyId = it.id; nextBuyName = it.name; }
+  });
   var html = '';
   if (hasAmt) {
     html += '<div class="shop-sum">' +
       '<div class="ss-row"><span>🧮 ' + t('shopTotal') + '</span><b>' + fmt(pendingTotal + doneTotal) + '</b></div>' +
-      '<div class="ss-row"><span>🛍️ ' + (settings.lang === 'en' ? 'Left to buy' : 'Abhi kharidna hai') + '</span><b style="color:var(--accent)">' + fmt(pendingTotal) + ' <small>(' + pendingCount + ')</small></b></div>' +
+      '<div class="ss-row"><span>🛍️ ' + (settings.lang === 'en' ? 'Left to buy' : 'Abhi kharidna hai') + '</span><b style="color:var(--accent)">' + fmt(pendingTotal) + ' <small>(' + pendingCount + (nextBuyName ? ' • 👉 ' + escapeHtml(nextBuyName) : '') + ')</small></b></div>' +
       '<div class="ss-row"><span>✓ ' + (settings.lang === 'en' ? 'Bought' : 'Kharid liya') + '</span><b style="color:var(--ok)">' + fmt(doneTotal) + ' <small>(' + doneCount + ')</small></b></div>' +
       '</div>';
   } else {
@@ -973,7 +979,8 @@ function renderShop() {
     html += '<div class="income-row" style="gap:8px;">' +
       '<button type="button" class="shop-tick' + (it.done ? ' done' : '') + '" data-shtick="' + it.id + '" title="' + (it.done ? 'Wapas kholо' : 'Kharid liya ✓') + '">' + (it.done ? '✓' : '') + '</button>' +
       '<span class="shop-name' + (it.done ? ' done' : '') + '" style="flex:1;">' + escapeHtml(it.name) +
-      (it.amt > 0 ? ' <span class="shop-amt">₹' + it.amt + '</span>' : '') + '</span>' +
+      (it.amt > 0 ? ' <span class="shop-amt">₹' + it.amt + '</span>' : '') +
+      (it.id === nextBuyId ? '<span class="next-buy">👉 ' + t('shopNext') + '</span>' : '') + '</span>' +
       (it.done ? '<button type="button" class="shop-conv" data-shconv="' + it.id + '" title="' + t('shopConvert') + '">' + t('shopConvert') + '</button>' : '') +
       '<button type="button" class="i-del" data-shdel="' + it.id + '">✕</button>' +
       '</div>';

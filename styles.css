@@ -366,6 +366,13 @@ header p { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
 }
 .shop-sum .ss-row b { white-space: nowrap; font-size: 0.85rem; }
 .shop-sum .ss-row:first-child b { font-size: 0.95rem; color: var(--accent); }
+.next-buy {
+  display: inline-block; font-size: 0.62rem; font-weight: 800;
+  background: var(--soft2); color: var(--accent);
+  border: 1px dashed var(--accent); border-radius: 8px;
+  padding: 1px 7px; margin-left: 6px; white-space: nowrap;
+  vertical-align: middle;
+}
 .fest-bar-wrap { height: 8px; border-radius: 6px; background: var(--soft2); overflow: hidden; margin: 4px 0 6px; }
 .fest-bar { height: 100%; border-radius: 6px; background: #16a34a; transition: width 0.3s; }
 .cmp-row {
