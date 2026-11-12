@@ -147,6 +147,22 @@ header p { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
 .modal-card input:focus, .modal-card select:focus { border-color: var(--accent); background: var(--card); }
 .modal-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); margin: 10px 0 5px; }
 .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+/* Full-screen family modals (Udhaar / Shopping / Festival) */
+.modal-overlay.fs { padding: 0; }
+.modal-overlay.fs .modal-card {
+  max-width: 100%; height: 100%; min-height: 100%;
+  border-radius: 0; padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto; animation: slideUp 0.25s ease;
+}
+.modal-overlay.fs .modal-title {
+  font-size: 1.15rem; padding-bottom: 10px; margin-bottom: 14px;
+  border-bottom: 1.5px solid var(--line);
+}
+.modal-overlay.fs .income-history { max-height: none; }
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
 .m-cancel { background: var(--soft2); color: var(--muted); }
 .m-save { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #fff; }
 .m-danger { background: linear-gradient(90deg, #ef4444, #f97316); color: #fff; }
