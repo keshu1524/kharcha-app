@@ -1,5 +1,9 @@
 /* ============ Kharcha Tracker - App Logic ============ */
 
+// App version (har release me bump karo + sw.js CACHE_NAME + index.html ?v=N)
+var APP_VERSION = 'v29';
+var APP_FEATURES = 30;
+
 // ================== DATA ==================
 var DB_KEY = 'kharcha_db_v1';
 var SETTINGS_KEY = 'kharcha_settings_v1';
@@ -1235,6 +1239,7 @@ document.getElementById('settingsBtn').addEventListener('click', function () {
   cycleDayInput.value = settings.cycleDay === 1 ? '' : settings.cycleDay;
   document.getElementById('settingsNameInput').value = getUserName();
   renderRecList();
+  document.getElementById('appVersion').innerHTML = '📦 Keshu Kharcha Tracker <b>' + APP_VERSION + '</b> — ' + APP_FEATURES + ' features ✨';
   settingsModal.hidden = false;
 });
 document.getElementById('settingsCancel').addEventListener('click', function () { settingsModal.hidden = true; });
