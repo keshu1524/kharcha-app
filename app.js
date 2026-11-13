@@ -229,6 +229,7 @@ var T = {
     shopAllDone: '✅ Sab kharid liya — badhai!', shopAllOpened: '↩️ Sab wapas pending me',
     festSaved: '🪔 Festival budget ban gaya:', festBad: '⚠️ Naam aur total budget dono likhein', festDeleted: '🗑️ Festival hata diya (uske kharche list me rehte hain)',
     festSpentOf: 'kharch hua', festSpendSaved: '🪔 Festival me kharcha jud gaya:', festSpendBad: '⚠️ Kharche ka naam aur rakam likhein', festOver: '🚨 Budget se zyada kharch!',
+    festBacha: '💰 Bache hai', festOverAmt: 'zyada kharch ho gaya',
     compareTitle: '📊 Is mahine vs pichle mahine', compareNoPrev: 'Pichle mahine ka data khaali hai — comparison agle mahine se dikhega'
   },
   en: {
@@ -338,6 +339,7 @@ var T = {
     shopAllDone: '✅ All bought — well done!', shopAllOpened: '↩️ All back to pending',
     festSaved: '🪔 Festival budget created:', festBad: '⚠️ Name and total budget both needed', festDeleted: '🗑️ Festival removed (its expenses stay)',
     festSpentOf: 'spent', festSpendSaved: '🪔 Added to festival:', festSpendBad: '⚠️ Expense name and amount needed', festOver: '🚨 Over budget!',
+    festBacha: '💰 Left', festOverAmt: 'over budget',
     compareTitle: '📊 This month vs last', compareNoPrev: 'No data last month — comparison shows from next month'
   }
 };
@@ -1082,14 +1084,21 @@ function renderFest() {
     prof().expenses.forEach(function (e) { if (e.festival === f.id) spent += Number(e.amount) || 0; });
     var pct = Math.min(Math.round((spent / f.total) * 100), 100);
     var color = pct >= 100 ? '#ef4444' : (pct >= 70 ? '#f59e0b' : '#16a34a');
+    var bacha = f.total - spent;
+    var bachaHtml = bacha >= 0
+      ? '<b style="color:#16a34a;">' + t('festBacha') + ': ' + fmt(bacha) + '</b>'
+      : '<b style="color:#ef4444;">' + t('festBacha') + ': -' + fmt(Math.abs(bacha)) + ' <small>(' + t('festOverAmt') + ')</small></b>';
     html += '<div style="padding:6px 2px;border-bottom:1px dashed var(--line);">' +
       '<div class="income-row" style="border:none;padding:0;">' +
       '<span>🪔 <b>' + escapeHtml(f.name) + '</b></span>' +
       '<span class="i-amt" style="color:' + color + '">' + fmt(spent) + ' / ' + fmt(f.total) + (spent > f.total ? ' ' + t('festOver') : '') + '</span>' +
       '</div>' +
       '<div class="fest-bar-wrap"><div class="fest-bar" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
-      '<div class="income-row" style="border:none;padding:0;">' +
+      '<div class="income-row" style="border:none;padding:4px 0 0;">' +
       '<small style="color:var(--muted);">' + pct + '% ' + t('festSpentOf') + '</small>' +
+      bachaHtml +
+      '</div>' +
+      '<div class="income-row" style="border:none;padding:2px 0 0;">' +
       '<span><button type="button" class="shop-conv" data-fadd="' + f.id + '">💰 ' + (settings.lang === 'en' ? 'Add expense' : 'Kharcha jodo') + '</button> ' +
       '<button type="button" class="i-del" data-fdel="' + f.id + '">✕</button></span>' +
       '</div></div>';
@@ -1130,11 +1139,14 @@ document.getElementById('festSpendSave').addEventListener('click', function () {
   var cid = autoCategory(nm);
   p.expenses.push({ id: Date.now(), name: nm, amount: amt, date: dt, category: cid, festival: pendingFest });
   saveDB();
+  var newSpent = 0;
+  p.expenses.forEach(function (e) { if (e.festival === pendingFest) newSpent += Number(e.amount) || 0; });
+  var bacha2 = f.total - newSpent;
   document.getElementById('festSpendForm').hidden = true;
   pendingFest = null;
   renderFest();
   render();
-  showToast(t('festSpendSaved') + ' ' + f.name + ' — ' + CATEGORIES[cid].icon + ' ' + fmt(amt));
+  showToast(t('festSpendSaved') + ' ' + f.name + ' — ' + CATEGORIES[cid].icon + ' ' + fmt(amt) + (bacha2 >= 0 ? ' (' + t('festBacha') + ' ' + fmt(bacha2) + ')' : ' (' + fmt(Math.abs(bacha2)) + ' ' + t('festOverAmt') + ')'));
 });
 function festBadge(e) {
   if (!e.festival) return '';
